@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="AppTheme" parent="AppTheme.Base" />
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar" />
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat">
+    <style name="AppDefault" parent="AppTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="windowActionBar">false</item>
-    </style>
+        <item name="colorControlNormal">@color/colorWhite</item>
 
+        <item name="android:statusBarColor" tools:targetApi="lollipop">@android:color/transparent</item>
+    </style>
 </resources>
