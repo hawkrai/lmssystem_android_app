@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.celt.lms.fragment.AbstractTabFragment;
 import com.celt.lms.fragment.ExampleFragment;
+import com.celt.lms.fragment.NewsFragment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class TabsPagerFragmentAdapter extends FragmentPagerAdapter {
 
     private void initTabsMap(Context context) {
         tabs = new HashMap<Integer, AbstractTabFragment>();
-        tabs.put(0, ExampleFragment.getInstance(context));
+        tabs.put(0, NewsFragment.getInstance(context));
         tabs.put(1, ExampleFragment.getInstance(context));
     }
 }

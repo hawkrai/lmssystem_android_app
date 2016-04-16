@@ -16,7 +16,7 @@ public class ExampleFragment extends AbstractTabFragment {
         ExampleFragment fragment = new ExampleFragment();
         fragment.setArguments(args);
         fragment.setContext(context);
-        fragment.setTitle("News");
+        fragment.setTitle("Example");
 
         return fragment;
     }
