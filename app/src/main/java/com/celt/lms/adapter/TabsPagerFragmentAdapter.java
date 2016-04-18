@@ -4,21 +4,17 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import com.celt.lms.fragment.AbstractTabFragment;
-import com.celt.lms.fragment.ExampleFragment;
-import com.celt.lms.fragment.NewsFragment;
-
-import java.util.HashMap;
-import java.util.Map;
+import android.support.v4.util.SparseArrayCompat;
+import com.celt.lms.AbstractFragment;
+import com.celt.lms.R;
 
 public class TabsPagerFragmentAdapter extends FragmentPagerAdapter {
 
-    private Map<Integer, AbstractTabFragment> tabs;
-    private Context context;
+    private SparseArrayCompat<AbstractFragment> tabs;
+//    private Context context;
 
     public TabsPagerFragmentAdapter(Context context, FragmentManager fm) {
         super(fm);
-        this.context = context;
         initTabsMap(context);
     }
 
@@ -38,8 +34,9 @@ public class TabsPagerFragmentAdapter extends FragmentPagerAdapter {
     }
 
     private void initTabsMap(Context context) {
-        tabs = new HashMap<Integer, AbstractTabFragment>();
-        tabs.put(0, NewsFragment.getInstance(context));
-        tabs.put(1, ExampleFragment.getInstance(context));
+        tabs = new SparseArrayCompat<AbstractFragment>();
+        tabs.put(0, new AbstractFragment(context, "News", R.layout.fragment, new NewsListAdapter(), "https://collapsed.space/ServicesNewsNewsService.svcGetNews2025.json"));
+        tabs.put(1, new AbstractFragment(context, "Lectures", R.layout.fragment, new LecturesListAdapter(), "https://collapsed.space/ServicesLecturesLecturesService.svcGetLectures2025.json"));
+        tabs.put(2, new AbstractFragment(context, "Labs", R.layout.fragment, new LabsListAdapter(), "https://collapsed.space/ServicesLabsLabsService.svcGetLabs2025.json"));
     }
 }
