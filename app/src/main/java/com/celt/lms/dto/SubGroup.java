@@ -29,4 +29,7 @@ public class SubGroup {
         return scheduleProtectionLabs;
     }
 
+    public List<Student> getStudents() {
+        return students;
+    }
 }

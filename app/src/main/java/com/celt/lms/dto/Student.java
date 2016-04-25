@@ -2,7 +2,7 @@ package com.celt.lms.dto;
 
 import java.util.ArrayList;
 
-class Student {
+public class Student {
     int groupId;
     private ArrayList<FileLab> fileLabs;
     private String fullName;
@@ -29,5 +29,25 @@ class Student {
         this.studentLabMarks = studentLabMarks;
         this.studentPracticalMarks = studentPracticalMarks;
         this.testMark = testMark;
+    }
+
+    public String getTestMark() {
+        return testMark;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getLabsMarkTotal() {
+        return labsMarkTotal;
+    }
+
+    public ArrayList<StudentLabMark> getStudentLabMarks() {
+        return studentLabMarks;
+    }
+
+    public ArrayList<LabVisitingMark> getLabVisitingMark() {
+        return labVisitingMark;
     }
 }

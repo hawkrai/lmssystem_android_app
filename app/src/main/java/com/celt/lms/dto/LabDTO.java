@@ -25,6 +25,10 @@ public class LabDTO {
         this.theme = theme;
     }
 
+    public String getShortName() {
+        return shortName;
+    }
+
     public int getDuration() {
         return duration;
     }

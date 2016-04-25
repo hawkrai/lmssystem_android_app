@@ -1,6 +1,6 @@
 package com.celt.lms.dto;
 
-class StudentLabMark {
+public class StudentLabMark {
     private int labId;
     private String mark;
     private int studentId;
@@ -11,5 +11,9 @@ class StudentLabMark {
         this.mark = mark;
         this.studentId = studentId;
         this.studentLabMarkId = studentLabMarkId;
+    }
+
+    public String getMark() {
+        return mark;
     }
 }

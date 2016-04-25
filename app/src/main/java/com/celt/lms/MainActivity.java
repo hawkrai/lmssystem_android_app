@@ -104,7 +104,8 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private SparseArrayCompat<AbsFragment> getTabs2() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
         tabs.put(0, new FragmentSecondTab(this, 0, "Labs", R.layout.fragment, new LabsScheduleListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
-        tabs.put(1, new FragmentSecondTab(this, 1, "LecturesVisiting", R.layout.fragment, new LecturesVisitingListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
+        tabs.put(1, new FragmentSecondTab(this, 1, "Visiting", R.layout.fragment, new LecturesVisitingListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
+        tabs.put(2, new FragmentSecondTab(this, 2, "LabMarks", R.layout.fragment, new LabMarksListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
         return tabs;
     }
 
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                 if (data != null) {
                     ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
                     ((FragmentSecondTab) adapterList.get(1).getTabs().get(1)).setAdapter(data.get(spinner.getSelectedItemPosition()).getLecturesMarkVisiting());
+                    ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
                 }
             }
 
@@ -141,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 List<GroupDTO> data = groupDTOList;
                 ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
+                ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
             }
 
             @Override
@@ -241,6 +244,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         if (data != null) {
             FragmentSecondTab f = (FragmentSecondTab) adapterList.get(1).getTabs().get(0);
             FragmentSecondTab f2 = (FragmentSecondTab) adapterList.get(1).getTabs().get(1);
+            FragmentSecondTab f3 = (FragmentSecondTab) adapterList.get(1).getTabs().get(2);
 
             groupDTOList = data;
 
@@ -261,9 +265,11 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
             f.setAdapter((data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
             f2.setAdapter((data.get(spinner.getSelectedItemPosition()).getLecturesMarkVisiting()));
+            f3.setAdapter((data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
 
             f.setRefreshing(false);
             f2.setRefreshing(false);
+            f3.setRefreshing(false);
 
             Toast.makeText(getApplicationContext(), "23", Toast.LENGTH_SHORT).show();
 
@@ -277,7 +283,8 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         protected void onPreExecute() {
             super.onPreExecute();
             ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setRefreshing(true);
-            ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setRefreshing(true);
+            ((FragmentSecondTab) adapterList.get(1).getTabs().get(1)).setRefreshing(true);
+            ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setRefreshing(true);
         }
 
         @Override
