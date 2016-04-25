@@ -105,16 +105,16 @@ public abstract class ParsingJsonLms {
         return attachmentsList;
     }
 
-    private static ArrayList<Group> getParseGroup(String json) throws JSONException {
+    public static ArrayList<GroupDTO> getParseGroup(String json) {
         try {
             return getGroups(getJsonArray(json, "Groups"));
         } catch (JSONException e) {
-            return new ArrayList<Group>();
+            return new ArrayList<GroupDTO>();
         }
     }
 
-    private static ArrayList<Group> getGroups(JSONArray jsonGroups) throws JSONException {
-        ArrayList<Group> groupList = new ArrayList<Group>();
+    private static ArrayList<GroupDTO> getGroups(JSONArray jsonGroups) throws JSONException {
+        ArrayList<GroupDTO> groupList = new ArrayList<GroupDTO>();
         if (jsonGroups != null)
             for (int i = 0; i < jsonGroups.length(); i++) {
                 JSONObject obj = jsonGroups.getJSONObject(i);
@@ -130,7 +130,7 @@ public abstract class ParsingJsonLms {
                 SubGroup subGroupsOne = getSubGroup(obj.getJSONObject("SubGroupsOne"));
                 SubGroup subGroupsTwo = getSubGroup(obj.getJSONObject("SubGroupsTwo"));
 
-                groupList.add(new Group(grouptId, groupName, lecturesMarkVisitingList, scheduleProtectionPracticals, students, subGroupsOne, subGroupsTwo));
+                groupList.add(new GroupDTO(grouptId, groupName, lecturesMarkVisitingList, scheduleProtectionPracticals, students, subGroupsOne, subGroupsTwo));
             }
         return groupList;
     }

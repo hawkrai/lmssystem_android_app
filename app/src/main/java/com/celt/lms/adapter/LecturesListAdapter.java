@@ -48,8 +48,8 @@ public class LecturesListAdapter extends RecyclerView.Adapter<LecturesListAdapte
     }
 
     @Override
-    public void setData(List data) {
-        this.data = data;
+    public void setData(Object data) {
+        this.data = (List) data;
     }
 
     static class LecturesViewHolder extends RecyclerView.ViewHolder {

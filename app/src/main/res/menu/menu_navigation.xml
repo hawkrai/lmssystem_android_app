@@ -1,42 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item
-			android:id="@+id/news"
-			android:title="Новости"
+			android:id="@+id/item1"
+			android:title="Предмет"
 			android:orderInCategory="0"/>
 
 	<item
-			android:id="@+id/precis"
-			android:title="Лекции"
+			android:id="@+id/item2"
+			android:title="Labs"
 			android:orderInCategory="1"/>
 
-	<item
-			android:id="@+id/labs"
-			android:title="Лабораторные работы"
-			android:orderInCategory="1"/>
-
-	<item
-			android:id="@+id/files"
-			android:title="Файлы"
-			android:orderInCategory="1"/>
-
-	<item
-			android:id="@+id/tests"
-			android:title="Тестирование знаний"
-			android:orderInCategory="1"/>
-
-	<item
-			android:id="@+id/metmat"
-			android:title="Методические материалы"
-			android:orderInCategory="1"/>
-
-	<item
-			android:id="@+id/changepr"
-			android:title="Сменить предмет"
-			android:orderInCategory="1"/>
-
-	<item
-			android:id="@+id/backmain"
-			android:title="В главное меню"
-			android:orderInCategory="1"/>
 </menu>

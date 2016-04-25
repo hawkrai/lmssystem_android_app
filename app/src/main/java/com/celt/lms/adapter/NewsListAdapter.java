@@ -55,8 +55,8 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
     }
 
     @Override
-    public void setData(List data) {
-        this.data = data;
+    public void setData(Object data) {
+        this.data = (List) data;
     }
 
     static class NewsViewHolder extends RecyclerView.ViewHolder {

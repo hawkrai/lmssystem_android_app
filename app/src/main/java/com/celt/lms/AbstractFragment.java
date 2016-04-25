@@ -4,24 +4,18 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import com.celt.lms.adapter.ListAdapter;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
-public class AbstractFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class AbstractFragment extends AbsFragment implements SwipeRefreshLayout.OnRefreshListener {
     private Context context;
     private int layout;
     private String url;
@@ -31,18 +25,6 @@ public class AbstractFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public AbstractFragment() {
     }
-
-//    public static AbstractFragment getInstance(Context context, String title, int layout, ListAdapter adapter, String url) {
-//        Bundle args = new Bundle();
-//        AbstractFragment fragment = new AbstractFragment();
-//        fragment.setArguments(args);
-//        fragment.context = context;
-//        fragment.title = title;
-//        fragment.adapter = adapter;
-//        fragment.layout = layout;
-//        fragment.url = url;
-//        return fragment;
-//    }
 
     public AbstractFragment(Context context, String title, int layout, ListAdapter adapter, String url) {
         Bundle args = new Bundle();
@@ -62,6 +44,8 @@ public class AbstractFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        new gedDataAsyncTask().execute(url);
+
     }
 
     @Nullable
@@ -76,14 +60,20 @@ public class AbstractFragment extends Fragment implements SwipeRefreshLayout.OnR
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-
+        if (adapter.getItemCount() == 0)
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
         return view;
     }
 
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        new NewsAsyncTask().execute(url);
+        new gedDataAsyncTask().execute(url);
     }
 
     @Override
@@ -96,36 +86,11 @@ public class AbstractFragment extends Fragment implements SwipeRefreshLayout.OnR
         super.onViewStateRestored(savedInstanceState);
     }
 
-    private String downloadJson(String param) {
-        try {
-            URL url = new URL(param);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
-                }
-                bufferedReader.close();
-
-                return stringBuilder.toString();
-            } catch (Exception e) {
-                return null;
-            } finally {
-                urlConnection.disconnect();
-            }
-        } catch (Exception e) {
-            Log.e("ERROR", e.getMessage(), e);
-            return null;
-        }
-    }
-
-    private class NewsAsyncTask extends AsyncTask<String, Void, List> {
+    private class gedDataAsyncTask extends AsyncTask<String, Void, List> {
 
         @Override
         protected List doInBackground(String... params) {
-            return adapter.getParse(downloadJson(params[0]));
+            return adapter.getParse(MainActivity.downloadJson(params[0]));
         }
 
         @Override

@@ -36,4 +36,8 @@ public class LabDTO {
     public String getTheme() {
         return theme;
     }
+
+    public List<ScheduleProtectionLabsRecomend> getScheduleProtectionLabsRecomend() {
+        return scheduleProtectionLabsRecomend;
+    }
 }

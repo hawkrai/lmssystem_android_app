@@ -49,8 +49,8 @@ public class LabsListAdapter extends RecyclerView.Adapter<LabsListAdapter.LabVie
     }
 
     @Override
-    public void setData(List data) {
-        this.data = data;
+    public void setData(Object data) {
+        this.data = (List) data;
     }
 
     static class LabViewHolder extends RecyclerView.ViewHolder {

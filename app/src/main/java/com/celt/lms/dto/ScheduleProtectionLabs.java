@@ -1,6 +1,6 @@
 package com.celt.lms.dto;
 
-class ScheduleProtectionLabs {
+public class ScheduleProtectionLabs {
     private String date;
     private int scheduleProtectionLabId;
     private int subGroupId;
@@ -9,5 +9,9 @@ class ScheduleProtectionLabs {
         this.date = date;
         this.scheduleProtectionLabId = scheduleProtectionLabId;
         this.subGroupId = subGroupId;
+    }
+
+    public String getDate() {
+        return date;
     }
 }

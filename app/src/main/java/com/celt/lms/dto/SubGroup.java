@@ -2,7 +2,7 @@ package com.celt.lms.dto;
 
 import java.util.List;
 
-class SubGroup {
+public class SubGroup {
     private int groupId;
     private List<LabDTO> labs;
     private String name;
@@ -20,4 +20,13 @@ class SubGroup {
         this.students = students;
         this.subGroupId = subGroupId;
     }
+
+    public List<LabDTO> getLabs() {
+        return labs;
+    }
+
+    public List<ScheduleProtectionLabs> getScheduleProtectionLabs() {
+        return scheduleProtectionLabs;
+    }
+
 }

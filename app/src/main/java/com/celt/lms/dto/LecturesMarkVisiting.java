@@ -2,7 +2,7 @@ package com.celt.lms.dto;
 
 import java.util.List;
 
-class LecturesMarkVisiting {
+public class LecturesMarkVisiting {
     private String login;
     private List<Mark> marks;
     private int studentId;
@@ -13,5 +13,13 @@ class LecturesMarkVisiting {
         this.marks = marks;
         this.studentId = studentId;
         this.studentName = studentName;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public List<Mark> getMarks() {
+        return marks;
     }
 }
