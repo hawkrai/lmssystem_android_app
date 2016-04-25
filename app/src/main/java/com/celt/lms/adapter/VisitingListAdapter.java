@@ -7,23 +7,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.celt.lms.R;
-import com.celt.lms.dto.LecturesMarkVisiting;
-import com.celt.lms.dto.Mark;
-import com.celt.lms.dto.ParsingJsonLms;
+import com.celt.lms.dto.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LecturesVisitingListAdapter extends RecyclerView.Adapter<LecturesVisitingListAdapter.ViewHolder> implements ListAdapter {
+public class VisitingListAdapter extends RecyclerView.Adapter<VisitingListAdapter.ViewHolder> implements ListAdapter {
 
     private List<LecturesMarkVisiting> data = null;
+    private List<Student> students;
+    private List<ScheduleProtectionLabs> scheduleProtectionLabs;
 
-    public LecturesVisitingListAdapter() {
+    public VisitingListAdapter() {
         this.data = new ArrayList<LecturesMarkVisiting>();
-    }
-
-    public LecturesVisitingListAdapter(List<LecturesMarkVisiting> data) {
-        this.data = data;
+        this.students = new ArrayList<Student>();
+        this.scheduleProtectionLabs = new ArrayList<ScheduleProtectionLabs>();
     }
 
     @Override
@@ -43,11 +41,36 @@ public class LecturesVisitingListAdapter extends RecyclerView.Adapter<LecturesVi
             if (!mark.getMark().isEmpty())
                 s += mark.getDate() + " : " + mark.getMark() + "\r\n";
         }
+        if (!s.isEmpty())
+            s += "\r\n";
+
+        Student student = getStudent(item.getStudentName());
+        if (student != null)
+            for (LabVisitingMark visit : student.getLabVisitingMark()) {
+                if (!visit.getMark().isEmpty())
+                    s += getDate(visit.getScheduleProtectionLabId()) + " : " + visit.getMark() + "\r\n";
+            }
+
         if (s.isEmpty())
             s = "Пропусков нет!";
         holder.body.setText(s);
     }
 
+    private String getDate(int id) {
+        for (ScheduleProtectionLabs item : scheduleProtectionLabs) {
+            if (item.getScheduleProtectionLabId() == id)
+                return item.getDate();
+        }
+        return "";
+    }
+
+    private Student getStudent(String name) {
+        for (Student item : students) {
+            if (item.getFullName().equals(name))
+                return item;
+        }
+        return null;
+    }
     @Override
     public int getItemCount() {
         return data.size();
@@ -60,7 +83,12 @@ public class LecturesVisitingListAdapter extends RecyclerView.Adapter<LecturesVi
 
     @Override
     public void setData(Object data) {
-        this.data = (List<LecturesMarkVisiting>) data;
+        GroupDTO groupDTO = (GroupDTO) data;
+        this.data = groupDTO.getLecturesMarkVisiting();
+        this.students = groupDTO.getSubGroup(0).getStudents();
+        this.students.addAll(groupDTO.getSubGroup(1).getStudents());
+        this.scheduleProtectionLabs = groupDTO.getSubGroup(0).getScheduleProtectionLabs();
+        this.scheduleProtectionLabs.addAll(groupDTO.getSubGroup(1).getScheduleProtectionLabs());
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

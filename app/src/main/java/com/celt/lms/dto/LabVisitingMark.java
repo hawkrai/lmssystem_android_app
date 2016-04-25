@@ -1,6 +1,6 @@
 package com.celt.lms.dto;
 
-class LabVisitingMark {
+public class LabVisitingMark {
     private String comment;
     private int labVisitingMarkId;
     private String mark;
@@ -15,5 +15,13 @@ class LabVisitingMark {
         this.scheduleProtectionLabId = scheduleProtectionLabId;
         this.studentId = studentId;
         this.studentName = studentName;
+    }
+
+    public int getScheduleProtectionLabId() {
+        return scheduleProtectionLabId;
+    }
+
+    public String getMark() {
+        return mark;
     }
 }

@@ -11,6 +11,10 @@ public class ScheduleProtectionLabs {
         this.subGroupId = subGroupId;
     }
 
+    public int getScheduleProtectionLabId() {
+        return scheduleProtectionLabId;
+    }
+
     public String getDate() {
         return date;
     }

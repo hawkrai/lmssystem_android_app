@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private SparseArrayCompat<AbsFragment> getTabs2() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
         tabs.put(0, new FragmentSecondTab(this, 0, "Labs", R.layout.fragment, new LabsScheduleListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
-        tabs.put(1, new FragmentSecondTab(this, 1, "Visiting", R.layout.fragment, new LecturesVisitingListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
+        tabs.put(1, new FragmentSecondTab(this, 1, "Visiting", R.layout.fragment, new VisitingListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
         tabs.put(2, new FragmentSecondTab(this, 2, "LabMarks", R.layout.fragment, new LabMarksListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
         return tabs;
     }
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                 List<GroupDTO> data = groupDTOList;
                 if (data != null) {
                     ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
-                    ((FragmentSecondTab) adapterList.get(1).getTabs().get(1)).setAdapter(data.get(spinner.getSelectedItemPosition()).getLecturesMarkVisiting());
+                    ((FragmentSecondTab) adapterList.get(1).getTabs().get(1)).setAdapter(data.get(spinner.getSelectedItemPosition()));
                     ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
                 }
             }
@@ -217,14 +217,14 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getText().equals("LecturesVisiting"))
+                if (tab.getText().equals("Visiting"))
                     spinner2.setVisibility(View.GONE);
                 viewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getText().equals("LecturesVisiting"))
+                if (tab.getText().equals("Visiting"))
                     spinner2.setVisibility(View.VISIBLE);
             }
 
@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             }
 
             f.setAdapter((data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
-            f2.setAdapter((data.get(spinner.getSelectedItemPosition()).getLecturesMarkVisiting()));
+            f2.setAdapter(data.get(spinner.getSelectedItemPosition()));
             f3.setAdapter((data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
 
             f.setRefreshing(false);

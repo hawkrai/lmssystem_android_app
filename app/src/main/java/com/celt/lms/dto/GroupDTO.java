@@ -11,6 +11,9 @@ public class GroupDTO {
     private SubGroup subGroupsOne;
     private SubGroup subGroupsTwo;
 
+    public GroupDTO() {
+    }
+
     public GroupDTO(int groupId, String groupName, List<LecturesMarkVisiting> lecturesMarkVisiting, List<ScheduleProtectionPracticals> scheduleProtectionPracticals, List<Student> students, SubGroup subGroupsOne, SubGroup subGroupsTwo) {
         this.groupId = groupId;
         this.groupName = groupName;
