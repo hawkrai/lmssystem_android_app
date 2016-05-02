@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Lms</string>
-    <string name="hello_world">Hello world!</string>
     <string name="open">open</string>
     <string name="close">close</string>
+    <string name="network_error">Произошла сетевая ошибка. Проверьте, что подключение к интернету работает стабильно.
+    </string>
 </resources>

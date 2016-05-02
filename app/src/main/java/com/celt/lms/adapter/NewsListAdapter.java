@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.celt.lms.R;
+import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.NewsDTO;
 import com.celt.lms.dto.ParsingJsonLms;
+import retrofit2.Call;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
     public void onBindViewHolder(NewsViewHolder holder, int position) {
         NewsDTO item = (NewsDTO) data.get(position);
         if (!item.getTitle().isEmpty()) {
+            holder.title.setVisibility(View.VISIBLE);
             holder.title.setText(item.getTitle());
         } else {
             holder.title.setVisibility(View.GONE);
@@ -52,6 +55,11 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
     @Override
     public List getParse(String s) {
         return ParsingJsonLms.getParseNews(s);
+    }
+
+    @Override
+    public Call getCall(ApiLms api) {
+        return api.getNews(2025);
     }
 
     @Override

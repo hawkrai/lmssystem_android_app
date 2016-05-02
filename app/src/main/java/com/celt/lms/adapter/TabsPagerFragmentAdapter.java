@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.util.SparseArrayCompat;
-import com.celt.lms.AbsFragment;
+import com.celt.lms.fragments.AbsFragment;
 
 public class TabsPagerFragmentAdapter extends FragmentStatePagerAdapter {
 

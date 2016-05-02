@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.celt.lms.R;
+import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.*;
+import retrofit2.Call;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,11 @@ public class VisitingListAdapter extends RecyclerView.Adapter<VisitingListAdapte
     @Override
     public List getParse(String s) {
         return ParsingJsonLms.getParseGroup(s);
+    }
+
+    @Override
+    public Call getCall(ApiLms api) {
+        return null;
     }
 
     @Override

@@ -1,28 +1,20 @@
-package com.celt.lms;
+package com.celt.lms.fragments;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Toast;
+import com.celt.lms.R;
 import com.celt.lms.adapter.ListAdapter;
+import com.celt.lms.onEventListener;
 
 import static com.celt.lms.MainActivity.setFragment;
 
-public class FragmentSecondTab extends AbsFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class FragmentSecondTab extends AbsFragment {
+
     private onEventListener someEventListener;
-    private View view;
-    private Context context;
-    private int layout;
     private String url;
-    private ListAdapter adapter;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private String title;
     private int key;
 
     public FragmentSecondTab() {
@@ -43,9 +35,6 @@ public class FragmentSecondTab extends AbsFragment implements SwipeRefreshLayout
         return key;
     }
 
-    public String getTitle() {
-        return title;
-    }
 
     public void setAdapter(Object data) {
         this.adapter.setData(data);
@@ -64,24 +53,6 @@ public class FragmentSecondTab extends AbsFragment implements SwipeRefreshLayout
         setRetainInstance(true);
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(layout, container, false);
-
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycleView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter((RecyclerView.Adapter<RecyclerView.ViewHolder>) adapter);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        if (adapter.getItemCount() == 0)
-            setRefreshing(true);
-
-        return view;
-    }
-
     public void setRefreshing(boolean bool) {
         if (mSwipeRefreshLayout != null) {
             if (bool)
@@ -98,7 +69,12 @@ public class FragmentSecondTab extends AbsFragment implements SwipeRefreshLayout
 
     @Override
     public void onRefresh() {
-        someEventListener.updateGroupList("https://collapsed.space/ServicesCoreService.svcGetGroups2025.json");
+        if (isNetworkConnected(context))
+            someEventListener.updateGroupList("https://collapsed.space/ServicesCoreService.svcGetGroups2025.json");
+        else {
+            Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override

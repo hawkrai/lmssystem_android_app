@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.celt.lms.R;
+import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.LecturesDTO;
 import com.celt.lms.dto.ParsingJsonLms;
+import retrofit2.Call;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,11 @@ public class LecturesListAdapter extends RecyclerView.Adapter<LecturesListAdapte
     @Override
     public List getParse(String s) {
         return ParsingJsonLms.getParseLectures(s);
+    }
+
+    @Override
+    public Call getCall(ApiLms api) {
+        return api.getLectures(2025);
     }
 
     @Override

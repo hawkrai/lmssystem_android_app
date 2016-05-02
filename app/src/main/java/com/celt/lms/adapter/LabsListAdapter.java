@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.celt.lms.R;
+import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.LabDTO;
 import com.celt.lms.dto.ParsingJsonLms;
+import retrofit2.Call;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,11 @@ public class LabsListAdapter extends RecyclerView.Adapter<LabsListAdapter.LabVie
     @Override
     public List getParse(String s) {
         return ParsingJsonLms.getParseLabs(s);
+    }
+
+    @Override
+    public Call getCall(ApiLms api) {
+        return api.getLabs(2025);
     }
 
     @Override
