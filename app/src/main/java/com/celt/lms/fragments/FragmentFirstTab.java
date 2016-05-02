@@ -15,15 +15,15 @@ import retrofit2.Call;
 import java.io.IOException;
 import java.util.List;
 
-public class AbstractFragment extends AbsFragment {
+public class FragmentFirstTab extends AbsFragment {
 
     private String url;
     private ApiLms api;
 
-    public AbstractFragment() {
+    public FragmentFirstTab() {
     }
 
-    public AbstractFragment(Context context, String title, int layout, ListAdapter adapter, String url) {
+    public FragmentFirstTab(Context context, String title, int layout, ListAdapter adapter, String url) {
         Bundle args = new Bundle();
         setArguments(args);
         this.context = context;

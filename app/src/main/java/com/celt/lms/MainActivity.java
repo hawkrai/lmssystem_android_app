@@ -24,7 +24,7 @@ import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.GroupDTO;
 import com.celt.lms.dto.ParsingJsonLms;
 import com.celt.lms.fragments.AbsFragment;
-import com.celt.lms.fragments.AbstractFragment;
+import com.celt.lms.fragments.FragmentFirstTab;
 import com.celt.lms.fragments.FragmentSecondTab;
 import com.google.gson.JsonElement;
 import retrofit2.Call;
@@ -96,9 +96,9 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
     private SparseArrayCompat<AbsFragment> getTabs() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
-        tabs.put(0, new AbstractFragment(this, "News", R.layout.fragment, new NewsListAdapter(), "https://collapsed.space/ServicesNewsNewsService.svcGetNews2025.json"));
-        tabs.put(1, new AbstractFragment(this, "Lectures", R.layout.fragment, new LecturesListAdapter(), "https://collapsed.space/ServicesLecturesLecturesService.svcGetLectures2025.json"));
-        tabs.put(2, new AbstractFragment(this, "Labs", R.layout.fragment, new LabsListAdapter(), "https://collapsed.space/ServicesLabsLabsService.svcGetLabs2025.json"));
+        tabs.put(0, new FragmentFirstTab(this, "News", R.layout.fragment, new NewsListAdapter(), "https://collapsed.space/ServicesNewsNewsService.svcGetNews2025.json"));
+        tabs.put(1, new FragmentFirstTab(this, "Lectures", R.layout.fragment, new LecturesListAdapter(), "https://collapsed.space/ServicesLecturesLecturesService.svcGetLectures2025.json"));
+        tabs.put(2, new FragmentFirstTab(this, "Labs", R.layout.fragment, new LabsListAdapter(), "https://collapsed.space/ServicesLabsLabsService.svcGetLabs2025.json"));
         return tabs;
     }
 
