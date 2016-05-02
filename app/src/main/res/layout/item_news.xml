@@ -25,21 +25,21 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:id="@+id/title"
-					android:textSize="8pt"
-					android:paddingBottom="5dp"/>
+					android:textSize="@dimen/title_size"
+					android:paddingBottom="4dp"/>
 
 			<TextView
 					android:id="@+id/body"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:text="TEST"
-					android:paddingBottom="5dp"/>
+					android:textSize="@dimen/text_size"
+					android:paddingBottom="8dp"/>
 
 			<TextView
 					android:id="@+id/date"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:text="TEST"/>
+					android:textSize="@dimen/text_size"/>
 
 		</LinearLayout>
 

@@ -48,5 +48,19 @@ public abstract class AbsFragment extends android.support.v4.app.Fragment implem
     public void onRefresh() {
 
     }
+
+    public void setRefreshing(boolean bool) {
+        if (mSwipeRefreshLayout != null) {
+            if (bool)
+                mSwipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(true);
+                    }
+                });
+            else
+                mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
 }
 

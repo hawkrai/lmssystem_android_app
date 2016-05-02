@@ -13,4 +13,6 @@ public interface ListAdapter {
     void setData(Object data);
 
     void notifyDataSetChanged();
+
+    int getItemCount();
 }

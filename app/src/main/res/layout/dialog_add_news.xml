@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="15dp">
+
+	<EditText
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:inputType="textPersonName"
+			android:id="@+id/titleNews"
+			android:layout_gravity="center_horizontal"
+			android:hint="Заголовок"/>
+
+
+	<EditText
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/textNews"
+			android:hint="Текст"/>
+
+	<CheckBox
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Обновить дату"
+			android:id="@+id/checkBoxDate"/>
+
+</LinearLayout>

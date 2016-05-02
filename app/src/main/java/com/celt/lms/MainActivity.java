@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.util.SparseArrayCompat;
@@ -26,6 +27,7 @@ import com.celt.lms.dto.ParsingJsonLms;
 import com.celt.lms.fragments.AbsFragment;
 import com.celt.lms.fragments.FragmentFirstTab;
 import com.celt.lms.fragments.FragmentSecondTab;
+import com.celt.lms.fragments.dialogs.SaveNewsDialogFragment;
 import com.google.gson.JsonElement;
 import retrofit2.Call;
 
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
     private static final int LAYOUT = R.layout.activity_main;
     private static ArrayList<TabsPagerFragmentAdapter> adapterList;
+    private static boolean is;
+
     private ApiLms api;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -45,7 +49,11 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private TabLayout tabLayout;
     private Spinner spinner;
     private Spinner spinner2;
+    private FloatingActionButton fab;
 
+    public static boolean is() {
+        return is;
+    }
 
     public static void setFragment(FragmentSecondTab fragment) {
         adapterList.get(1).getTabs().append(fragment.getKey(), fragment);
@@ -72,8 +80,22 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         if (savedInstanceState == null) {
             viewPager.setAdapter(adapterList.get(0));
             tabLayout.setupWithViewPager(viewPager);
-            new getGroupsAsyncTask().execute("https://collapsed.space/ServicesCoreService.svcGetGroups2025.json");
+            if (isNetworkConnected()) {
+                new getGroupsAsyncTask().execute("https://collapsed.space/ServicesCoreService.svcGetGroups2025.json");
+                is = true;
+            }
         }
+        setOnTabSelectedListener();
+
+
+        fab = (FloatingActionButton) findViewById(R.id.fabButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SaveNewsDialogFragment().show(getSupportFragmentManager(), "dialog");
+            }
+        });
+
     }
 
     @Override
@@ -81,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         super.onRestoreInstanceState(savedInstanceState);
         viewPager.setAdapter(adapterList.get(savedInstanceState.getInt("count")));
         tabLayout.setupWithViewPager(viewPager);
-        setOnTabSelectedListener();
         if (savedInstanceState.getInt("count") == 1) {
             setVisibilitySpinners(View.VISIBLE);
             if (tabLayout.getSelectedTabPosition() == 1)
@@ -120,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
+        setSupportActionBar(toolbar);
 
         spinner = (Spinner) findViewById(R.id.spinner_nav);
         spinner2 = (Spinner) findViewById(R.id.spinner_nav2);
@@ -250,12 +272,16 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                 if (tab.getText() == "Visiting")
                     spinner2.setVisibility(View.GONE);
                 viewPager.setCurrentItem(tab.getPosition());
+                if (tab.getText() == "News")
+                    fab.show();
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 if (tab.getText() == "Visiting" && spinner2.getCount() != 0)
                     spinner2.setVisibility(View.VISIBLE);
+                if (tab.getText() == "News")
+                    fab.hide();
             }
 
             @Override
@@ -283,11 +309,8 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             if (!isNetworkConnected()) {
                 this.cancel(true);
                 Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                return;
+                is = false;
             }
-            ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setRefreshing(true);
-            ((FragmentSecondTab) adapterList.get(1).getTabs().get(1)).setRefreshing(true);
-            ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setRefreshing(true);
         }
 
         @Override
@@ -299,13 +322,16 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                     if (json != null)
                         return ParsingJsonLms.getParseGroup(json.toString());
                 }
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ArrayList<GroupDTO>();
             }
             return new ArrayList<GroupDTO>();
         }
 
         @Override
         protected void onPostExecute(List<GroupDTO> data) {
+            is = false;
             setDataGroups(data);
         }
     }

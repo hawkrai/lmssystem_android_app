@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import com.celt.lms.R;
 import com.celt.lms.adapter.ListAdapter;
@@ -19,7 +22,6 @@ public class FragmentFirstTab extends AbsFragment {
 
     private String url;
     private ApiLms api;
-
     public FragmentFirstTab() {
     }
 
@@ -40,15 +42,26 @@ public class FragmentFirstTab extends AbsFragment {
         api = ApiFactory.getService();
 
         if (isNetworkConnected(context))
-            new gedDataAsyncTask().execute(url);
+            new GetDataAsyncTask().execute(url);
         else
             Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
+        if (savedInstanceState == null)
+            setRetainInstance(true);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        if (adapter.getItemCount() == 0)
+            setRefreshing(true);
+        return v;
     }
 
     @Override
     public void onRefresh() {
         if (isNetworkConnected(context)) {
-            new gedDataAsyncTask().execute(url);
+            new GetDataAsyncTask().execute(url);
         } else {
             Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
             mSwipeRefreshLayout.setRefreshing(false);
@@ -65,7 +78,7 @@ public class FragmentFirstTab extends AbsFragment {
         super.onViewStateRestored(savedInstanceState);
     }
 
-    private class gedDataAsyncTask extends AsyncTask<String, Void, List> {
+    private class GetDataAsyncTask extends AsyncTask<String, Void, List> {
 
         @Override
         protected List doInBackground(String... params) {

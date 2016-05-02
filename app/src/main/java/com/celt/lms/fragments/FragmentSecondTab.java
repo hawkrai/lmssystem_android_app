@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
+import com.celt.lms.MainActivity;
 import com.celt.lms.R;
 import com.celt.lms.adapter.ListAdapter;
 import com.celt.lms.onEventListener;
@@ -45,27 +46,17 @@ public class FragmentSecondTab extends AbsFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setFragment(this);
+        if (MainActivity.is())
+            setRefreshing(true);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        if (savedInstanceState == null)
+            setRetainInstance(true);
     }
 
-    public void setRefreshing(boolean bool) {
-        if (mSwipeRefreshLayout != null) {
-            if (bool)
-                mSwipeRefreshLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSwipeRefreshLayout.setRefreshing(true);
-                    }
-                });
-            else
-                mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
 
     @Override
     public void onRefresh() {
