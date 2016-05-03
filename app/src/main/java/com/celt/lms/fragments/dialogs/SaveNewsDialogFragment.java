@@ -29,17 +29,28 @@ public class SaveNewsDialogFragment extends DialogFragment {
     private EditText editTitle;
     private EditText editText;
     private CheckBox editDate;
+    private int subjectId;
+    private int idNews = 0;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
+        Bundle mArgs = getArguments();
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.dialog_add_news, null);
 
+        subjectId = mArgs.getInt("subjectId");
+        idNews = mArgs.getInt("idNews");
+
         editTitle = (EditText) view.findViewById(R.id.titleNews);
+        editTitle.setText(mArgs.getString("title"));
+
         editText = (EditText) view.findViewById(R.id.textNews);
+        editText.setText(mArgs.getString("text"));
+
         editDate = (CheckBox) view.findViewById(R.id.checkBoxDate);
+        if (!mArgs.getBoolean("is", false))
+            editDate.setVisibility(View.GONE);
 
         builder.setView(view);
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -65,6 +76,7 @@ public class SaveNewsDialogFragment extends DialogFragment {
         AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {
             Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
             positiveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -74,19 +86,22 @@ public class SaveNewsDialogFragment extends DialogFragment {
 
                     ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                     if (cm.getActiveNetworkInfo() != null) {
-                        new CallTask().execute(createJsonObjectNews(title, body, isDate));
+                        new CallTask().execute(createJsonObjectNews(subjectId, idNews, title, body, isDate));
                     } else
                         Toast.makeText(getContext(), getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 }
             });
+
+            Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
+            negativeButton.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         }
     }
 
-    private JSONObject createJsonObjectNews(String title, String body, boolean isDate) {
+    private JSONObject createJsonObjectNews(int subjectId, int id, String title, String body, boolean isDate) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("subjectId", String.valueOf(2014));
-            jsonObject.put("id", "0");
+            jsonObject.put("subjectId", String.valueOf(subjectId));
+            jsonObject.put("id", id);
             jsonObject.put("title", title);
             jsonObject.put("body", body);
             jsonObject.put("isOldDate", isDate);

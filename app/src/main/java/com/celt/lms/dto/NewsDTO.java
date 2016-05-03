@@ -31,4 +31,13 @@ public class NewsDTO {
     public String getBody() {
         return body;
     }
+
+    public int getSubjectId() {
+        return subjectId;
+    }
+
+    public int getNewsId() {
+
+        return newsId;
+    }
 }

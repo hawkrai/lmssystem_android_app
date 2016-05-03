@@ -3,7 +3,6 @@ package com.celt.lms.api;
 import com.google.gson.JsonElement;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.http.*;
 
 public interface ApiLms {
@@ -25,7 +24,7 @@ public interface ApiLms {
 
     @Headers("Content-Type: application/json")
     @POST("/Services/News/NewsService.svc/Delete")
-    Call<Response> deleteNews(@Body RequestBody json);
+    Call<JsonElement> deleteNews(@Body RequestBody json);
 
 
 //    @GET("/Services/Labs/LabsService.svc/GetLabs/{id}")

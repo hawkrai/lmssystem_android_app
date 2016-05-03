@@ -63,6 +63,7 @@
 				android:layout_marginRight="@dimen/fab_margin"
 				android:src="@mipmap/ic_plus"
 				app:borderWidth="0dp"
+				app:pressedTranslationZ="6dp"
 				app:layout_behavior="com.celt.lms.ScrollingFABBehavior"/>
 
 	</android.support.design.widget.CoordinatorLayout>

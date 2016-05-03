@@ -4,4 +4,9 @@
     <string name="close">close</string>
     <string name="network_error">Произошла сетевая ошибка. Проверьте, что подключение к интернету работает стабильно.
     </string>
+    <string name="remove_news_question">Удалить новость?</string>
+    <string name="news_deleted">Новость удалена.</string>
+    <string name="title">Заголовок</string>
+    <string name="text">Текст</string>
+    <string name="update_date">Обновить дату</string>
 </resources>

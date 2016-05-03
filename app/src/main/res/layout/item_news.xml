@@ -18,8 +18,11 @@
 		<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:padding="16dp"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:paddingLeft="16dp"
+				android:paddingTop="16dp"
+				android:paddingRight="16dp"
+				android:paddingBottom="8dp">
 
 			<TextView
 					android:layout_width="wrap_content"
@@ -40,6 +43,33 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:textSize="@dimen/text_size"/>
+
+			<LinearLayout android:layout_height="wrap_content"
+			              android:layout_width="match_parent"
+			              android:orientation="horizontal"
+			              android:gravity="right">
+
+				<ImageButton
+						android:layout_width="28dp"
+						android:layout_height="28dp"
+						android:id="@+id/btnShare"
+						android:src="@mipmap/ic_share_variant"
+						android:background="#00ffffff" android:layout_marginRight="8dp"/>
+				<ImageButton
+						android:layout_width="28dp"
+						android:layout_height="28dp"
+						android:id="@+id/btnEdit"
+						android:src="@mipmap/ic_pencil"
+						android:background="#00ffffff" android:layout_marginLeft="8dp"
+						android:layout_marginRight="8dp"/>
+				<ImageButton
+						android:layout_width="28dp"
+						android:layout_height="28dp"
+						android:id="@+id/btnDelete"
+						android:src="@mipmap/ic_delete"
+						android:background="#00ffffff" android:layout_marginLeft="8dp"/>
+
+			</LinearLayout>
 
 		</LinearLayout>
 

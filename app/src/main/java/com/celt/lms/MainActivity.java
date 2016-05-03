@@ -87,16 +87,24 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         }
         setOnTabSelectedListener();
 
-
         fab = (FloatingActionButton) findViewById(R.id.fabButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new SaveNewsDialogFragment().show(getSupportFragmentManager(), "dialog");
+                Bundle args = new Bundle();
+                args.putInt("subjectId", 2014);
+                args.putInt("idNews", 0);
+                args.putBoolean("is", false);
+                args.putString("title", "");
+                args.putString("text", "");
+
+                SaveNewsDialogFragment df = (new SaveNewsDialogFragment());
+                df.setArguments(args);
+                df.show(getSupportFragmentManager(), "dialog");
             }
         });
-
     }
+
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -117,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
     private SparseArrayCompat<AbsFragment> getTabs() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
-        tabs.put(0, new FragmentFirstTab(this, "News", R.layout.fragment, new NewsListAdapter(), "https://collapsed.space/ServicesNewsNewsService.svcGetNews2025.json"));
+        tabs.put(0, new FragmentFirstTab(this, "News", R.layout.fragment, new NewsListAdapter(this), "https://collapsed.space/ServicesNewsNewsService.svcGetNews2025.json"));
         tabs.put(1, new FragmentFirstTab(this, "Lectures", R.layout.fragment, new LecturesListAdapter(), "https://collapsed.space/ServicesLecturesLecturesService.svcGetLectures2025.json"));
         tabs.put(2, new FragmentFirstTab(this, "Labs", R.layout.fragment, new LabsListAdapter(), "https://collapsed.space/ServicesLabsLabsService.svcGetLabs2025.json"));
         return tabs;
