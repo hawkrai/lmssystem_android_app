@@ -296,8 +296,10 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             public void onTabUnselected(TabLayout.Tab tab) {
                 if (tab.getText() == "Visiting" && spinner2.getCount() != 0)
                     spinner2.setVisibility(View.VISIBLE);
-                if (tab.getText() == "News")
+                if (tab.getText() == "News") {
                     fab.hide();
+                    fab.setVisibility(View.GONE);
+                }
             }
 
             @Override

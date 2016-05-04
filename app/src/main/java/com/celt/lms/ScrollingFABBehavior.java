@@ -6,9 +6,12 @@ import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
+
+import static com.celt.lms.R.id.tabLayout;
 
 public class ScrollingFABBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 //    private int toolbarHeight;
@@ -62,10 +65,12 @@ public class ScrollingFABBehavior extends CoordinatorLayout.Behavior<FloatingAct
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionButton child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-        if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
-            child.hide();
-        } else if (dyConsumed < 0 && child.getVisibility() == View.GONE) {
-            child.show();
+        if(((TabLayout) coordinatorLayout.findViewById(tabLayout)).getTabAt(((TabLayout) coordinatorLayout.findViewById(tabLayout)).getSelectedTabPosition()).getText()=="News") {
+            if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
+                child.hide();
+            } else if (dyConsumed < 0 && child.getVisibility() == View.GONE) {
+                child.show();
+            }
         }
     }
 
