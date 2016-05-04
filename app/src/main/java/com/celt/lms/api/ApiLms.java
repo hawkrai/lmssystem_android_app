@@ -38,12 +38,4 @@ public interface ApiLms {
 //
 //    @GET("/Services/CoreService.svc/GetGroups/{id}")
 //    Call<JsonElement> getGroups(@Path("id") int groupId);
-//
-//    @Headers( "Content-Type: application/json" )
-//    @POST("/Services/News/NewsService.svc/Save")
-//    Call<JsonElement> addNews(@Body RequestBody json);
-//
-//    @Headers( "Content-Type: application/json" )
-//    @POST("/Services/News/NewsService.svc/Delete")
-//    Call<Response> deleteNews(@Body RequestBody json);
 }

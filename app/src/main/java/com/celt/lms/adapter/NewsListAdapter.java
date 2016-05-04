@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import com.celt.lms.MainActivity;
 import com.celt.lms.R;
 import com.celt.lms.api.ApiFactory;
 import com.celt.lms.api.ApiLms;
@@ -193,7 +194,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
 
     @Override
     public Call getCall(ApiLms api) {
-        return api.getNews(2025);
+        return api.getNews(MainActivity.getSubjectId());
     }
 
     @Override

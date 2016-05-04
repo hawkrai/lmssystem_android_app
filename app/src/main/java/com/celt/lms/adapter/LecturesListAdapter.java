@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.celt.lms.MainActivity;
 import com.celt.lms.R;
 import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.LecturesDTO;
@@ -51,7 +52,7 @@ public class LecturesListAdapter extends RecyclerView.Adapter<LecturesListAdapte
 
     @Override
     public Call getCall(ApiLms api) {
-        return api.getLectures(2025);
+        return api.getLectures(MainActivity.getSubjectId());
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -139,7 +140,7 @@ public class SaveNewsDialogFragment extends DialogFragment {
                 result = getResources().getString(R.string.network_error);
             else
                 dismiss();
-            Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+            Snackbar.make(getActivity().findViewById(R.id.appbar),result,Snackbar.LENGTH_LONG).show();
         }
     }
 }

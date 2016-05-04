@@ -20,19 +20,17 @@ import java.util.List;
 
 public class FragmentFirstTab extends AbsFragment {
 
-    private String url;
     private ApiLms api;
     public FragmentFirstTab() {
     }
 
-    public FragmentFirstTab(Context context, String title, int layout, ListAdapter adapter, String url) {
+    public FragmentFirstTab(Context context, String title, int layout, ListAdapter adapter) {
         Bundle args = new Bundle();
         setArguments(args);
         this.context = context;
         this.title = title;
         this.adapter = adapter;
         this.layout = layout;
-        this.url = url;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class FragmentFirstTab extends AbsFragment {
         api = ApiFactory.getService();
 
         if (isNetworkConnected(context))
-            new GetDataAsyncTask().execute(url);
+            new GetDataAsyncTask().execute();
         else
             Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
         if (savedInstanceState == null)
@@ -61,7 +59,7 @@ public class FragmentFirstTab extends AbsFragment {
     @Override
     public void onRefresh() {
         if (isNetworkConnected(context)) {
-            new GetDataAsyncTask().execute(url);
+            new GetDataAsyncTask().execute();
         } else {
             Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
             mSwipeRefreshLayout.setRefreshing(false);
@@ -78,10 +76,10 @@ public class FragmentFirstTab extends AbsFragment {
         super.onViewStateRestored(savedInstanceState);
     }
 
-    private class GetDataAsyncTask extends AsyncTask<String, Void, List> {
+    private class GetDataAsyncTask extends AsyncTask<Void, Void, List> {
 
         @Override
-        protected List doInBackground(String... params) {
+        protected List doInBackground(Void... params) {
             try {
                 Call<JsonElement> call = adapter.getCall(api);
                 JsonElement json = call.execute().body();

@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private static final int LAYOUT = R.layout.activity_main;
     private static ArrayList<TabsPagerFragmentAdapter> adapterList;
     private static boolean is;
+    private static int subjectId;
 
     private ApiLms api;
     private Toolbar toolbar;
@@ -59,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         adapterList.get(1).getTabs().append(fragment.getKey(), fragment);
     }
 
+    public static int getSubjectId() {
+        return subjectId;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppDefault);
@@ -66,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         setContentView(LAYOUT);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
+
+//        subjectId = 2014;
+        subjectId = 2025;
 
         initToolbar();
         initNavigationView();
@@ -81,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             viewPager.setAdapter(adapterList.get(0));
             tabLayout.setupWithViewPager(viewPager);
             if (isNetworkConnected()) {
-                new getGroupsAsyncTask().execute("https://collapsed.space/ServicesCoreService.svcGetGroups2025.json");
+                new getGroupsAsyncTask().execute();
                 is = true;
             }
         }
@@ -92,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             @Override
             public void onClick(View v) {
                 Bundle args = new Bundle();
-                args.putInt("subjectId", 2014);
+                args.putInt("subjectId", getSubjectId());
                 args.putInt("idNews", 0);
                 args.putBoolean("is", false);
                 args.putString("title", "");
@@ -125,17 +133,17 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
     private SparseArrayCompat<AbsFragment> getTabs() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
-        tabs.put(0, new FragmentFirstTab(this, "News", R.layout.fragment, new NewsListAdapter(this), "https://collapsed.space/ServicesNewsNewsService.svcGetNews2025.json"));
-        tabs.put(1, new FragmentFirstTab(this, "Lectures", R.layout.fragment, new LecturesListAdapter(), "https://collapsed.space/ServicesLecturesLecturesService.svcGetLectures2025.json"));
-        tabs.put(2, new FragmentFirstTab(this, "Labs", R.layout.fragment, new LabsListAdapter(), "https://collapsed.space/ServicesLabsLabsService.svcGetLabs2025.json"));
+        tabs.put(0, new FragmentFirstTab(this, "News", R.layout.fragment, new NewsListAdapter(this)));
+        tabs.put(1, new FragmentFirstTab(this, "Lectures", R.layout.fragment, new LecturesListAdapter()));
+        tabs.put(2, new FragmentFirstTab(this, "Labs", R.layout.fragment, new LabsListAdapter()));
         return tabs;
     }
 
     private SparseArrayCompat<AbsFragment> getTabs2() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
-        tabs.put(0, new FragmentSecondTab(this, 0, "Labs", R.layout.fragment, new LabsScheduleListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
-        tabs.put(1, new FragmentSecondTab(this, 1, "Visiting", R.layout.fragment, new VisitingListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
-        tabs.put(2, new FragmentSecondTab(this, 2, "LabMarks", R.layout.fragment, new LabMarksListAdapter(), "https://collapsed.space/ServicesCoreService.svcGetGroups2025.json"));
+        tabs.put(0, new FragmentSecondTab(this, 0, "Labs", R.layout.fragment, new LabsScheduleListAdapter()));
+        tabs.put(1, new FragmentSecondTab(this, 1, "Visiting", R.layout.fragment, new VisitingListAdapter()));
+        tabs.put(2, new FragmentSecondTab(this, 2, "LabMarks", R.layout.fragment, new LabMarksListAdapter()));
         return tabs;
     }
 
@@ -300,8 +308,8 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     }
 
     @Override
-    public void updateGroupList(Object s) {
-        new getGroupsAsyncTask().execute(String.valueOf(s));
+    public void updateGroupList() {
+        new getGroupsAsyncTask().execute();
     }
 
     private boolean isNetworkConnected() {
@@ -309,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         return cm.getActiveNetworkInfo() != null;
     }
 
-    private class getGroupsAsyncTask extends AsyncTask<String, Void, List<GroupDTO>> {
+    private class getGroupsAsyncTask extends AsyncTask<Void, Void, List<GroupDTO>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -322,10 +330,10 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         }
 
         @Override
-        protected ArrayList<GroupDTO> doInBackground(String... params) {
+        protected ArrayList<GroupDTO> doInBackground(Void... params) {
             try {
                 if (!isCancelled()) {
-                    Call<JsonElement> call = api.getGroups(2025);
+                    Call<JsonElement> call = api.getGroups(getSubjectId());
                     JsonElement json = call.execute().body();
                     if (json != null)
                         return ParsingJsonLms.getParseGroup(json.toString());

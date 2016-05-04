@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.celt.lms.MainActivity;
 import com.celt.lms.R;
 import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.LabDTO;
@@ -52,7 +53,7 @@ public class LabsListAdapter extends RecyclerView.Adapter<LabsListAdapter.LabVie
 
     @Override
     public Call getCall(ApiLms api) {
-        return api.getLabs(2025);
+        return api.getLabs(MainActivity.getSubjectId());
     }
 
     @Override
