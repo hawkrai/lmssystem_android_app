@@ -268,10 +268,12 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                     case 0:
                         viewPager.setAdapter(adapterList.get(0));
                         setVisibilitySpinners(View.GONE);
+                        fab.show();
                         break;
                     case 1:
                         viewPager.setAdapter(adapterList.get(1));
                         setVisibilitySpinners(View.VISIBLE);
+                        fab.hide();
                         break;
                 }
                 tabLayout.setupWithViewPager(viewPager);

@@ -33,24 +33,34 @@ public class VisitingListAdapter extends RecyclerView.Adapter<VisitingListAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         LecturesMarkVisiting item = data.get(position);
         holder.title.setText(String.valueOf(item.getStudentName()));
 
         String s = "";
         for (int i = 0; i < item.getMarks().size(); i++) {
             Mark mark = item.getMarks().get(i);
-            if (!mark.getMark().isEmpty())
+            if (!mark.getMark().isEmpty()) {
+                if (s.isEmpty())
+                    s += "Лекции:\r\n";
                 s += mark.getDate() + " : " + mark.getMark() + "\r\n";
+            }
         }
         if (!s.isEmpty())
             s += "\r\n";
 
+        boolean check = false;
         Student student = getStudent(item.getStudentName());
         if (student != null)
             for (LabVisitingMark visit : student.getLabVisitingMark()) {
-                if (!visit.getMark().isEmpty())
+                if (!visit.getMark().isEmpty()) {
+                    if (!check) {
+                        s += "Лабараторные работы:\r\n";
+                        check = true;
+                    }
+
                     s += getDate(visit.getScheduleProtectionLabId()) + " : " + visit.getMark() + "\r\n";
+                }
             }
 
         if (s.isEmpty())
@@ -73,6 +83,7 @@ public class VisitingListAdapter extends RecyclerView.Adapter<VisitingListAdapte
         }
         return null;
     }
+
     @Override
     public int getItemCount() {
         return data.size();
