@@ -13,13 +13,16 @@
 			android:layout_height="wrap_content"
 			android:id="@+id/cardView"
 			card:cardElevation="2dp"
-			card:cardUseCompatPadding="true">
+			card:cardUseCompatPadding="true"
+			android:clickable="true"
+			android:foreground="?selectableItemBackground">
 
 		<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:padding="16dp"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:animateLayoutChanges="true">
 
 			<TextView
 					android:layout_width="wrap_content"

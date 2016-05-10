@@ -28,33 +28,26 @@ public class FragmentSecondTab extends AbsFragment {
         this.title = title;
         this.adapter = adapter;
         this.layout = layout;
+        setRetainInstance(true);
     }
 
     public int getKey() {
         return key;
     }
 
-
     public void setAdapter(Object data) {
         this.adapter.setData(data);
         this.adapter.notifyDataSetChanged();
+        this.setRefreshing(false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setFragment(this);
-        if (MainActivity.is())
+        if (MainActivity.isCheckRefresh())
             setRefreshing(true);
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState == null)
-            setRetainInstance(true);
-    }
-
 
     @Override
     public void onRefresh() {

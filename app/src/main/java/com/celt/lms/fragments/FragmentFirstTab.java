@@ -21,8 +21,6 @@ import java.util.List;
 public class FragmentFirstTab extends AbsFragment {
 
     private ApiLms api;
-    public FragmentFirstTab() {
-    }
 
     public FragmentFirstTab(Context context, String title, int layout, ListAdapter adapter) {
         Bundle args = new Bundle();
@@ -31,28 +29,24 @@ public class FragmentFirstTab extends AbsFragment {
         this.title = title;
         this.adapter = adapter;
         this.layout = layout;
+        api = ApiFactory.getService();
+        setRetainInstance(true);
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-        api = ApiFactory.getService();
+    public FragmentFirstTab() {
 
-        if (isNetworkConnected(context))
-            new GetDataAsyncTask().execute();
-        else
-            Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
-        if (savedInstanceState == null)
-            setRetainInstance(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        if (adapter.getItemCount() == 0)
+        if (isNetworkConnected(context)) {
+            new GetDataAsyncTask().execute();
             setRefreshing(true);
+        } else {
+            Toast.makeText(context, R.string.network_error, Toast.LENGTH_SHORT).show();
+        }
         return v;
     }
 
@@ -99,9 +93,7 @@ public class FragmentFirstTab extends AbsFragment {
             } else {
                 Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
             }
-
             mSwipeRefreshLayout.setRefreshing(false);
-
         }
     }
 }

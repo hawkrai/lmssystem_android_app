@@ -71,7 +71,7 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
             return s2;
         if (!d(s).isEmpty() && d(s2).isEmpty())
             return s;
-        return String.format("%.2f", Float.parseFloat(s) + Float.parseFloat(s2) / 2);
+        return String.format("%.2f", (Float.parseFloat(s) + Float.parseFloat(s2)) / 2);
     }
 
     @Override

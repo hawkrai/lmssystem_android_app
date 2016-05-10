@@ -9,4 +9,8 @@
     <string name="title">Заголовок</string>
     <string name="text">Текст</string>
     <string name="update_date">Обновить дату</string>
+    <string name="news">НОВОСТИ</string>
+    <string name="visiting">ПОСЕЩЕНИЕ</string>
+    <string name="marks">ОЦЕНКИ</string>
+    <string name="education">ОБУЧЕНИЕ</string>
 </resources>

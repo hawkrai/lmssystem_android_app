@@ -103,7 +103,7 @@ public class VisitingListAdapter extends RecyclerView.Adapter<VisitingListAdapte
     public void setData(Object data) {
         GroupDTO groupDTO = (GroupDTO) data;
         this.data = groupDTO.getLecturesMarkVisiting();
-        this.students = groupDTO.getSubGroup(0).getStudents();
+        this.students = new ArrayList<Student>(groupDTO.getSubGroup(0).getStudents());
         this.students.addAll(groupDTO.getSubGroup(1).getStudents());
         this.scheduleProtectionLabs = groupDTO.getSubGroup(0).getScheduleProtectionLabs();
         this.scheduleProtectionLabs.addAll(groupDTO.getSubGroup(1).getScheduleProtectionLabs());

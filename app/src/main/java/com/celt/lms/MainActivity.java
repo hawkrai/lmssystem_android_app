@@ -23,6 +23,7 @@ import com.celt.lms.adapter.*;
 import com.celt.lms.api.ApiFactory;
 import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.GroupDTO;
+import com.celt.lms.dto.LecturesDTO;
 import com.celt.lms.dto.ParsingJsonLms;
 import com.celt.lms.fragments.AbsFragment;
 import com.celt.lms.fragments.FragmentFirstTab;
@@ -38,30 +39,31 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements onEventListener {
 
     private static final int LAYOUT = R.layout.activity_main;
-    private static ArrayList<TabsPagerFragmentAdapter> adapterList;
-    private static boolean is;
+    private static TabsPagerFragmentAdapter tabsPagerAdapter;
+    private static boolean isRefresh;
     private static int subjectId;
 
     private ApiLms api;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ViewPager viewPager;
-    private List<GroupDTO> groupDTOList;
     private TabLayout tabLayout;
     private Spinner spinner;
     private Spinner spinner2;
     private FloatingActionButton fab;
 
-    public static boolean is() {
-        return is;
-    }
+    private Object[] objects;
 
-    public static void setFragment(FragmentSecondTab fragment) {
-        adapterList.get(1).getTabs().append(fragment.getKey(), fragment);
+    public static boolean isCheckRefresh() {
+        return isRefresh;
     }
 
     public static int getSubjectId() {
         return subjectId;
+    }
+
+    public static void setFragment(FragmentSecondTab fragment) {
+        tabsPagerAdapter.getTabs().append(fragment.getKey(), fragment);
     }
 
     @Override
@@ -77,73 +79,42 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
         initToolbar();
         initNavigationView();
-        setVisibilitySpinners(View.GONE);
+        initFab();
 
-        adapterList = new ArrayList<TabsPagerFragmentAdapter>();
-        adapterList.add(new TabsPagerFragmentAdapter(this, getSupportFragmentManager(), getTabs()));
-        adapterList.add(new TabsPagerFragmentAdapter(this, getSupportFragmentManager(), getTabs2()));
+        tabsPagerAdapter = new TabsPagerFragmentAdapter(this, getSupportFragmentManager(), getTabs());
 
         api = ApiFactory.getService();
 
         if (savedInstanceState == null) {
-            viewPager.setAdapter(adapterList.get(0));
-            tabLayout.setupWithViewPager(viewPager);
+            setVisibilitySpinners(View.GONE);
             if (isNetworkConnected()) {
                 new getGroupsAsyncTask().execute();
-                is = true;
+                isRefresh = true;
             }
         }
+
+        viewPager.setAdapter(tabsPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
         setOnTabSelectedListener();
-
-        fab = (FloatingActionButton) findViewById(R.id.fabButton);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putInt("subjectId", getSubjectId());
-                args.putInt("idNews", 0);
-                args.putBoolean("is", false);
-                args.putString("title", "");
-                args.putString("text", "");
-
-                SaveNewsDialogFragment df = (new SaveNewsDialogFragment());
-                df.setArguments(args);
-                df.show(getSupportFragmentManager(), "dialog");
-            }
-        });
     }
-
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        viewPager.setAdapter(adapterList.get(savedInstanceState.getInt("count")));
-        tabLayout.setupWithViewPager(viewPager);
-        if (savedInstanceState.getInt("count") == 1) {
-            setVisibilitySpinners(View.VISIBLE);
-            if (tabLayout.getSelectedTabPosition() == 1)
-                spinner2.setVisibility(View.GONE);
-        } else {
+        objects = (Object[]) getLastCustomNonConfigurationInstance();
+        if (tabLayout.getSelectedTabPosition() == 0)
             setVisibilitySpinners(View.GONE);
-        }
-
-        groupDTOList = (List<GroupDTO>) getLastCustomNonConfigurationInstance();
-        setDataGroups(groupDTOList);
+        if (objects != null)
+            setDataGroups((List<GroupDTO>) objects[0], (List<LecturesDTO>) objects[1], savedInstanceState.getInt("spinner", 0), savedInstanceState.getInt("spinner2", 0));
     }
 
     private SparseArrayCompat<AbsFragment> getTabs() {
         SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
-        tabs.put(0, new FragmentFirstTab(this, "News", R.layout.fragment, new NewsListAdapter(this)));
-        tabs.put(1, new FragmentFirstTab(this, "Lectures", R.layout.fragment, new LecturesListAdapter()));
-        tabs.put(2, new FragmentFirstTab(this, "Labs", R.layout.fragment, new LabsListAdapter()));
-        return tabs;
-    }
-
-    private SparseArrayCompat<AbsFragment> getTabs2() {
-        SparseArrayCompat<AbsFragment> tabs = new SparseArrayCompat<AbsFragment>();
-        tabs.put(0, new FragmentSecondTab(this, 0, "Labs", R.layout.fragment, new LabsScheduleListAdapter()));
-        tabs.put(1, new FragmentSecondTab(this, 1, "Visiting", R.layout.fragment, new VisitingListAdapter()));
-        tabs.put(2, new FragmentSecondTab(this, 2, "LabMarks", R.layout.fragment, new LabMarksListAdapter()));
+        tabs.put(0, new FragmentFirstTab(this, getString(R.string.news), R.layout.fragment, new NewsListAdapter(this)));
+        tabs.put(1, new FragmentSecondTab(this, 1, getString(R.string.education), R.layout.fragment, new LecturesListAdapter()));
+        tabs.put(2, new FragmentSecondTab(this, 2, getString(R.string.visiting), R.layout.fragment, new VisitingListAdapter()));
+        tabs.put(3, new FragmentSecondTab(this, 3, getString(R.string.marks), R.layout.fragment, new LabMarksListAdapter()));
         return tabs;
     }
 
@@ -165,11 +136,15 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                List<GroupDTO> data = groupDTOList;
+                List<GroupDTO> data = (List<GroupDTO>) objects[0];
                 if (data != null) {
-                    ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
-                    ((FragmentSecondTab) adapterList.get(1).getTabs().get(1)).setAdapter(data.get(spinner.getSelectedItemPosition()));
-                    ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
+
+                    Object[] object = new Object[2];
+                    object[0] = objects[1];
+                    object[1] = data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition());
+                    ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(1)).setAdapter(object);
+                    ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(2)).setAdapter(data.get(spinner.getSelectedItemPosition()));
+                    ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
                 }
             }
 
@@ -182,9 +157,12 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                List<GroupDTO> data = groupDTOList;
-                ((FragmentSecondTab) adapterList.get(1).getTabs().get(0)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
-                ((FragmentSecondTab) adapterList.get(1).getTabs().get(2)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
+                List<GroupDTO> data = (List<GroupDTO>) objects[0];
+                Object[] object = new Object[2];
+                object[0] = objects[1];
+                object[1] = data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition());
+                ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(1)).setAdapter(object);
+                ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).setAdapter(data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition()));
             }
 
             @Override
@@ -194,62 +172,68 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         });
     }
 
+    private void initFab() {
+        fab = (FloatingActionButton) findViewById(R.id.fabButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putInt("subjectId", getSubjectId());
+                args.putInt("idNews", 0);
+                args.putBoolean("is", false);
+                args.putString("title", "");
+                args.putString("text", "");
+
+                SaveNewsDialogFragment df = (new SaveNewsDialogFragment());
+                df.setArguments(args);
+                df.show(getSupportFragmentManager(), "dialog");
+            }
+        });
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (adapterList.get(0).equals(viewPager.getAdapter()))
-            outState.putInt("count", 0);
-        else
-            outState.putInt("count", 1);
+        outState.putInt("spinner", spinner.getSelectedItemPosition());
+        outState.putInt("spinner2", spinner2.getSelectedItemPosition());
     }
 
-    private void setDataGroups(List<GroupDTO> data) {
-        FragmentSecondTab f = (FragmentSecondTab) adapterList.get(1).getTabs().get(0);
-        FragmentSecondTab f2 = (FragmentSecondTab) adapterList.get(1).getTabs().get(1);
-        FragmentSecondTab f3 = (FragmentSecondTab) adapterList.get(1).getTabs().get(2);
+    private void setDataGroups(List<GroupDTO> groupDTOList, List<LecturesDTO> lecturesDTOList, int spinnerSelect, int spinnerSelect2) {
+        FragmentSecondTab f1 = (FragmentSecondTab) tabsPagerAdapter.getTabs().get(1);
+        FragmentSecondTab f2 = (FragmentSecondTab) tabsPagerAdapter.getTabs().get(2);
+        FragmentSecondTab f3 = (FragmentSecondTab) tabsPagerAdapter.getTabs().get(3);
 
-        if (data != null && data.size() != 0) {
-
-            groupDTOList = data;
-
-            if (spinner.getAdapter() == null) {
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item);
-                arrayAdapter.setDropDownViewResource(R.layout.spinner_item2);
-                for (GroupDTO item : data) {
-                    arrayAdapter.add(item.getGroupName());
-                }
-                spinner.setAdapter(arrayAdapter);
-
-                ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item);
-                arrayAdapter2.setDropDownViewResource(R.layout.spinner_item2);
-                arrayAdapter2.add("Подгруппа 1");
-                arrayAdapter2.add("Подгруппа 2");
-                spinner2.setAdapter(arrayAdapter2);
-
-                if (viewPager.getAdapter() == adapterList.get(1)) {
-                    spinner.setVisibility(View.VISIBLE);
-                    if (tabLayout.getSelectedTabPosition() != 1)
-                        spinner2.setVisibility(View.VISIBLE);
-                }
+        if (spinner.getAdapter() == null) {
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item);
+            arrayAdapter.setDropDownViewResource(R.layout.spinner_item2);
+            for (GroupDTO item : groupDTOList) {
+                arrayAdapter.add(item.getGroupName());
             }
+            spinner.setAdapter(arrayAdapter);
+            spinner.setSelection(spinnerSelect);
 
-            f.setAdapter((data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
-            f2.setAdapter(data.get(spinner.getSelectedItemPosition()));
-            f3.setAdapter((data.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
-
-            Toast.makeText(getApplicationContext(), "Succeeded!", Toast.LENGTH_SHORT).show();
-
-        } else {
-            Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT).show();
+            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item);
+            arrayAdapter2.setDropDownViewResource(R.layout.spinner_item2);
+            arrayAdapter2.add("Подгруппа 1");
+            arrayAdapter2.add("Подгруппа 2");
+            spinner2.setAdapter(arrayAdapter2);
+            spinner2.setSelection(spinnerSelect2);
         }
-        f.setRefreshing(false);
-        f2.setRefreshing(false);
-        f3.setRefreshing(false);
+
+        Object[] objects = new Object[2];
+        objects[0] = lecturesDTOList;
+        objects[1] = groupDTOList.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition());
+        f1.setAdapter(objects);
+        f2.setAdapter(groupDTOList.get(spinner.getSelectedItemPosition()));
+        f3.setAdapter((groupDTOList.get(spinner.getSelectedItemPosition()).getSubGroup(spinner2.getSelectedItemPosition())));
+//
+//        f1.setRefreshing(false);
+//        f2.setRefreshing(false);
+//        f3.setRefreshing(false);
     }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return groupDTOList;
+        return objects;
     }
 
     private void initNavigationView() {
@@ -266,18 +250,18 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                 drawerLayout.closeDrawers();
                 switch (menuItem.getOrder()) {
                     case 0:
-                        viewPager.setAdapter(adapterList.get(0));
-                        setVisibilitySpinners(View.GONE);
-                        fab.show();
+//                        viewPager.setAdapter(tabsPagerAdapter.get(0));
+//                        setVisibilitySpinners(View.GONE);
+//                        fab.show();
                         break;
                     case 1:
-                        viewPager.setAdapter(adapterList.get(1));
-                        setVisibilitySpinners(View.VISIBLE);
-                        fab.hide();
+//                        viewPager.setAdapter(tabsPagerAdapter.get(1));
+//                        setVisibilitySpinners(View.VISIBLE);
+//                        fab.hide();
                         break;
                 }
-                tabLayout.setupWithViewPager(viewPager);
-                setOnTabSelectedListener();
+//                tabLayout.setupWithViewPager(viewPager);
+//                setOnTabSelectedListener();
                 return true;
             }
         });
@@ -287,18 +271,26 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getText() == "Visiting")
-                    spinner2.setVisibility(View.GONE);
                 viewPager.setCurrentItem(tab.getPosition());
-                if (tab.getText() == "News")
+
+                if (tab.getText() == getString(R.string.news)) {
+                    setVisibilitySpinners(View.GONE);
                     fab.show();
+                }
+
+                if (spinner.getAdapter() != null && (tab.getText() == getString(R.string.education) || tab.getText() == getString(R.string.marks))) {
+                    setVisibilitySpinners(View.VISIBLE);
+                }
+
+                if (spinner.getAdapter() != null && tab.getText() == getString(R.string.visiting)) {
+                    spinner.setVisibility(View.VISIBLE);
+                    spinner2.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getText() == "Visiting" && spinner2.getCount() != 0)
-                    spinner2.setVisibility(View.VISIBLE);
-                if (tab.getText() == "News") {
+                if (tab.getText() == getString(R.string.news)) {
                     fab.hide();
                     fab.setVisibility(View.GONE);
                 }
@@ -313,6 +305,9 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
     @Override
     public void updateGroupList() {
+        tabsPagerAdapter.getTabs().get(1).setRefreshing(true);
+        tabsPagerAdapter.getTabs().get(2).setRefreshing(true);
+        tabsPagerAdapter.getTabs().get(3).setRefreshing(true);
         new getGroupsAsyncTask().execute();
     }
 
@@ -321,38 +316,50 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         return cm.getActiveNetworkInfo() != null;
     }
 
-    private class getGroupsAsyncTask extends AsyncTask<Void, Void, List<GroupDTO>> {
+    private class getGroupsAsyncTask extends AsyncTask<Void, Void, ArrayList<JsonElement>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
             if (!isNetworkConnected()) {
                 this.cancel(true);
                 Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                is = false;
+                isRefresh = false;
             }
         }
 
         @Override
-        protected ArrayList<GroupDTO> doInBackground(Void... params) {
+        protected ArrayList<JsonElement> doInBackground(Void... params) {
             try {
                 if (!isCancelled()) {
+                    ArrayList<JsonElement> jsonList = new ArrayList<JsonElement>();
+                    Call<JsonElement> call2 = api.getLectures(getSubjectId());
+                    JsonElement json = call2.execute().body();
+                    jsonList.add(json);
+
                     Call<JsonElement> call = api.getGroups(getSubjectId());
-                    JsonElement json = call.execute().body();
-                    if (json != null)
-                        return ParsingJsonLms.getParseGroup(json.toString());
+                    json = call.execute().body();
+                    jsonList.add(json);
+                    return jsonList;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                return new ArrayList<GroupDTO>();
+                return null;
             }
-            return new ArrayList<GroupDTO>();
+            return null;
         }
 
         @Override
-        protected void onPostExecute(List<GroupDTO> data) {
-            is = false;
-            setDataGroups(data);
+        protected void onPostExecute(ArrayList<JsonElement> data) {
+            isRefresh = false;
+
+            if (data.get(0) != null && data.get(1) != null) {
+                objects = new Object[2];
+                objects[0] = ParsingJsonLms.getParseGroup(data.get(1).toString());
+                objects[1] = ParsingJsonLms.getParseLectures(data.get(0).toString());
+                setDataGroups((List<GroupDTO>) objects[0], (List<LecturesDTO>) objects[1], 0, 0);
+                Toast.makeText(getApplicationContext(), "Succeeded!", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT).show();
         }
     }
 }
