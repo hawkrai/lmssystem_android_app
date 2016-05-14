@@ -1,12 +1,16 @@
 package com.celt.lms.adapter;
 
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.text.InputType;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.celt.lms.R;
 import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.LabDTO;
 import com.celt.lms.dto.ParsingJsonLms;
@@ -16,26 +20,109 @@ import retrofit2.Call;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapter.ViewHolder> implements ListAdapter {
-
+    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
     private List<Student> data = null;
+    private static int cardId;
+    private static int titleId;
+    private static int bodyId;
+    private static ArrayList<Integer> listTextViewId;
+    private static ArrayList<Integer> listEditTextId;
     private List<LabDTO> labs;
+    private boolean editStatus;
 
     public LabMarksListAdapter() {
         this.data = new ArrayList<Student>();
         this.labs = new ArrayList<LabDTO>();
+        cardId = generateViewId();
+        titleId = generateViewId();
+        bodyId = generateViewId();
+        editStatus = false;
     }
 
-    public LabMarksListAdapter(SubGroup subGroup) {
-        this.data = subGroup.getStudents();
-        this.labs = subGroup.getLabs();
+    public boolean isEditStatus() {
+        return editStatus;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_lab, parent, false);
-        return new ViewHolder(view);
+        LinearLayout.LayoutParams layoutParams0 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams0.setMargins(convertDpToPx(parent, 12), convertDpToPx(parent, 5), convertDpToPx(parent, 12), convertDpToPx(parent, 5));
+        LinearLayout.LayoutParams layoutParamsMPWC = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        LinearLayout linearLayout = new LinearLayout(parent.getContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setLayoutParams(layoutParams0);
+
+        CardView cardView = new CardView(parent.getContext());
+        cardView.setId(cardId);
+        cardView.setCardElevation(2);
+        cardView.setUseCompatPadding(true);
+
+        LinearLayout linearLayout2 = new LinearLayout(parent.getContext());
+        linearLayout2.setOrientation(LinearLayout.VERTICAL);
+        linearLayout2.setPadding(convertDpToPx(parent, 16), convertDpToPx(parent, 16), convertDpToPx(parent, 16), convertDpToPx(parent, 16));
+
+        TextView textView = new TextView(parent.getContext());
+        textView.setId(titleId);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        linearLayout2.addView(textView, layoutParamsMPWC);
+
+        for (int i = 0; i < labs.size(); i++) {
+            LinearLayout linearLayout3 = new LinearLayout(parent.getContext());
+            linearLayout3.setOrientation(LinearLayout.HORIZONTAL);
+
+            TextView textView2 = new TextView(parent.getContext());
+            textView2.setId(listTextViewId.get(i));
+            textView2.setPadding(0, convertDpToPx(parent, 4), 0, 0);
+            textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            linearLayout3.addView(textView2, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            EditText editText = new EditText(parent.getContext());
+            editText.setId(listEditTextId.get(i));
+            editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            editText.setGravity(Gravity.CENTER_HORIZONTAL);
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+            linearLayout3.addView(editText, new LinearLayout.LayoutParams(convertDpToPx(parent, 40), LinearLayout.LayoutParams.WRAP_CONTENT));
+            linearLayout2.addView(linearLayout3, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        }
+
+        TextView textView2 = new TextView(parent.getContext());
+        textView2.setId(bodyId);
+        textView2.setPadding(0, convertDpToPx(parent, 4), 0, 0);
+        textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        linearLayout2.addView(textView2, layoutParamsMPWC);
+
+        cardView.addView(linearLayout2, layoutParamsMPWC);
+
+        linearLayout.addView(cardView, layoutParamsMPWC);
+
+        return new ViewHolder(linearLayout);
+    }
+
+    private int generateViewId() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return View.generateViewId();
+        } else {
+            for (; ; ) {
+                final int result = sNextGeneratedId.get();
+                // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+                int newValue = result + 1;
+                if (newValue > 0x00FFFFFF)
+                    newValue = 1; // Roll over to 1, not 0.
+                if (sNextGeneratedId.compareAndSet(result, newValue)) {
+                    return result;
+                }
+            }
+        }
+    }
+
+    private int convertDpToPx(ViewGroup parent, int dp) {
+        final float density = parent.getContext().getResources().getDisplayMetrics().density;
+        return (int) Math.ceil(dp * density);
     }
 
     @Override
@@ -43,33 +130,52 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
         Student item = data.get(position);
         holder.title.setText(item.getFullName());
 
-        String s = "";
         for (int i = 0; i < labs.size(); i++) {
-            if (!item.getStudentLabMarks().get(i).getMark().isEmpty())
-                s += labs.get(i).getShortName() + " Оценка: " + item.getStudentLabMarks().get(i).getMark() + "\r\n";
+
+            if (!item.getStudentLabMarks().get(i).getMark().isEmpty()) {
+                holder.listEdiText.get(i).setText(item.getStudentLabMarks().get(i).getMark());
+                if (editStatus) {
+                    holder.listTextView.get(i).setText(labs.get(i).getShortName() + " Оценка:");
+                    holder.listEdiText.get(i).setVisibility(View.VISIBLE);
+                } else {
+                    holder.listTextView.get(i).setText(labs.get(i).getShortName() + " Оценка: " + item.getStudentLabMarks().get(i).getMark());
+                    holder.listEdiText.get(i).setVisibility(View.GONE);
+                }
+            } else {
+                if (editStatus) {
+                    holder.listTextView.get(i).setText(labs.get(i).getShortName() + " Оценка:");
+                    holder.listTextView.get(i).setVisibility(View.VISIBLE);
+                    holder.listEdiText.get(i).setVisibility(View.VISIBLE);
+                } else {
+                    holder.listTextView.get(i).setVisibility(View.GONE);
+                    holder.listEdiText.get(i).setVisibility(View.GONE);
+                }
+            }
         }
 
-        if (!d(item.getLabsMarkTotal()).isEmpty())
-            s += "\r\nСредний балл: " + item.getLabsMarkTotal() + "\r\n";
-        if (!d(item.getTestMark()).isEmpty())
-            s += "Средний балл за тесты: " + d(item.getTestMark()) + "\r\n";
-        s += "Рейтинговая оценка: " + dd(item.getLabsMarkTotal(), item.getTestMark());
+        String s = "";
+
+        if (!checkAndConvertNullToEmpty(item.getLabsMarkTotal()).isEmpty())
+            s += "Средний балл: " + item.getLabsMarkTotal() + "\r\n";
+        if (!checkAndConvertNullToEmpty(item.getTestMark()).isEmpty())
+            s += "Средний балл за тесты: " + checkAndConvertNullToEmpty(item.getTestMark()) + "\r\n";
+        s += "Рейтинговая оценка: " + getAverage(item.getLabsMarkTotal(), item.getTestMark());
 
         holder.body.setText(s);
     }
 
-    private String d(String s) {
+    private String checkAndConvertNullToEmpty(String s) {
         if (s == null || s.isEmpty() || s.equals("null"))
             return "";
         return s;
     }
 
-    private String dd(String s, String s2) {
-        if (d(s).isEmpty() && d(s2).isEmpty())
+    private String getAverage(String s, String s2) {
+        if (checkAndConvertNullToEmpty(s).isEmpty() && checkAndConvertNullToEmpty(s2).isEmpty())
             return "";
-        if (d(s).isEmpty() && !d(s2).isEmpty())
+        if (checkAndConvertNullToEmpty(s).isEmpty() && !checkAndConvertNullToEmpty(s2).isEmpty())
             return s2;
-        if (!d(s).isEmpty() && d(s2).isEmpty())
+        if (!checkAndConvertNullToEmpty(s).isEmpty() && checkAndConvertNullToEmpty(s2).isEmpty())
             return s;
         return String.format("%.2f", (Float.parseFloat(s) + Float.parseFloat(s2)) / 2);
     }
@@ -94,18 +200,43 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
         SubGroup subGroup = (SubGroup) data;
         this.data = subGroup.getStudents();
         this.labs = subGroup.getLabs();
+        if (listTextViewId == null) {
+            listTextViewId = new ArrayList<Integer>();
+            for (int i = 0; i < this.labs.size(); i++) {
+                listTextViewId.add(generateViewId());
+            }
+        }
+        if (listEditTextId == null) {
+            listEditTextId = new ArrayList<Integer>();
+            for (int i = 0; i < this.labs.size(); i++) {
+                listEditTextId.add(generateViewId());
+            }
+        }
+    }
+
+    public void changeView() {
+        editStatus = !editStatus;
+        notifyDataSetChanged();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView title;
         TextView body;
-
+        ArrayList<TextView> listTextView;
+        ArrayList<EditText> listEdiText;
         public ViewHolder(View itemView) {
             super(itemView);
-            cardView = (CardView) itemView.findViewById(R.id.cardView);
-            title = (TextView) itemView.findViewById(R.id.title);
-            body = (TextView) itemView.findViewById(R.id.body);
+            cardView = (CardView) itemView.findViewById(cardId);
+            title = (TextView) itemView.findViewById(titleId);
+            body = (TextView) itemView.findViewById(bodyId);
+            listTextView = new ArrayList<TextView>();
+            listEdiText = new ArrayList<EditText>();
+            for (int i = 0; i < listTextViewId.size(); i++) {
+                listTextView.add((TextView) itemView.findViewById(listTextViewId.get(i)));
+                listEdiText.add((EditText) itemView.findViewById(listEditTextId.get(i)));
+            }
         }
     }
+
 }

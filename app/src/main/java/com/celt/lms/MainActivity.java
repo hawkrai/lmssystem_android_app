@@ -15,10 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.ScaleAnimation;
+import android.widget.*;
 import com.celt.lms.adapter.*;
 import com.celt.lms.api.ApiFactory;
 import com.celt.lms.api.ApiLms;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private FloatingActionButton fab;
 
     private Object[] objects;
+    private ActionBarDrawerToggle toggle;
 
     public static boolean isCheckRefresh() {
         return isRefresh;
@@ -177,19 +179,95 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putInt("subjectId", getSubjectId());
-                args.putInt("idNews", 0);
-                args.putBoolean("is", false);
-                args.putString("title", "");
-                args.putString("text", "");
+                switch (tabLayout.getSelectedTabPosition()) {
+                    case 0:
+                        Bundle args = new Bundle();
+                        args.putInt("subjectId", getSubjectId());
+                        args.putInt("idNews", 0);
+                        args.putBoolean("is", false);
+                        args.putString("title", "");
+                        args.putString("text", "");
 
-                SaveNewsDialogFragment df = (new SaveNewsDialogFragment());
-                df.setArguments(args);
-                df.show(getSupportFragmentManager(), "dialog");
+                        SaveNewsDialogFragment df = (new SaveNewsDialogFragment());
+                        df.setArguments(args);
+                        df.show(getSupportFragmentManager(), "dialog");
+                        break;
+                    case 3:
+                        ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
+                        if (((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).isTypeList()) {
+                            fab.hide();
+                            toggle.syncState();
+                            getSupportActionBar().setHomeAsUpIndicator(R.mipmap.ic_close);
+                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                            final ImageButton imageButton = (ImageButton) findViewById(R.id.saveButton);
+                            imageButton.setVisibility(View.VISIBLE);
+                            imageButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    disableEditStatus(imageButton);
+                                }
+                            });
+                            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    disableEditStatus(imageButton);
+                                }
+                            });
+                        }
+                        break;
+                }
+            }
+
+            private void disableEditStatus(ImageButton imageButton) {
+                ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
+                toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
+                drawerLayout.setDrawerListener(toggle);
+                toggle.syncState();
+                fab.show();
+                imageButton.setVisibility(View.GONE);
             }
         });
     }
+
+    private void animateFab(final int position) {
+        final int[] iconIntArray = {R.mipmap.ic_plus, R.mipmap.ic_pencil_dark};
+
+        fab.clearAnimation();
+        // Scale down animation
+        ScaleAnimation shrink = new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        shrink.setDuration(150);     // animation duration in milliseconds
+        shrink.setInterpolator(new DecelerateInterpolator());
+        shrink.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                fab.setImageDrawable(getResources().getDrawable(iconIntArray[position]));
+
+                // Scale up animation
+                ScaleAnimation expand = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                expand.setDuration(100);     // animation duration in milliseconds
+                expand.setInterpolator(new AccelerateInterpolator());
+                fab.startAnimation(expand);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        fab.startAnimation(shrink);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Toast.makeText(getApplicationContext(), "s", Toast.LENGTH_LONG).show();
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -239,25 +317,20 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
     private void initNavigationView() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 drawerLayout.closeDrawers();
                 switch (menuItem.getOrder()) {
                     case 0:
-//                        viewPager.setAdapter(tabsPagerAdapter.get(0));
-//                        setVisibilitySpinners(View.GONE);
-//                        fab.show();
                         break;
                     case 1:
-//                        viewPager.setAdapter(tabsPagerAdapter.get(1));
-//                        setVisibilitySpinners(View.VISIBLE);
-//                        fab.hide();
                         break;
                 }
 //                tabLayout.setupWithViewPager(viewPager);
@@ -275,7 +348,23 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
                 if (tab.getText() == getString(R.string.news)) {
                     setVisibilitySpinners(View.GONE);
-                    fab.show();
+                    if (fab.getVisibility() == View.GONE) {
+                        fab.setImageDrawable(getResources().getDrawable(R.mipmap.ic_plus));
+                        fab.show();
+                    } else
+                        animateFab(0);
+                }
+
+                if (tab.getText() == getString(R.string.marks)) {
+                    if (fab.getVisibility() == View.GONE) {
+                        fab.setImageDrawable(getResources().getDrawable(R.mipmap.ic_pencil_dark));
+                        fab.show();
+                    } else
+                        animateFab(1);
+                }
+
+                if (tab.getText() == getString(R.string.education) || tab.getText() == getString(R.string.visiting)) {
+                    fab.hide();
                 }
 
                 if (spinner.getAdapter() != null && (tab.getText() == getString(R.string.education) || tab.getText() == getString(R.string.marks))) {
@@ -290,10 +379,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getText() == getString(R.string.news)) {
-                    fab.hide();
-                    fab.setVisibility(View.GONE);
-                }
+
             }
 
             @Override

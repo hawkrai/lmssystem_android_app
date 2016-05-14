@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 import com.celt.lms.MainActivity;
 import com.celt.lms.R;
+import com.celt.lms.adapter.LabMarksListAdapter;
 import com.celt.lms.adapter.ListAdapter;
 import com.celt.lms.onEventListener;
 
@@ -67,5 +68,13 @@ public class FragmentSecondTab extends AbsFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onEventListener");
         }
+    }
+
+    public void changeView() {
+        ((LabMarksListAdapter) adapter).changeView();
+    }
+
+    public boolean isTypeList() {
+        return ((LabMarksListAdapter) adapter).isEditStatus();
     }
 }

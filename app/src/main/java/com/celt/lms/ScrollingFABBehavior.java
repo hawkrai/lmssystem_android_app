@@ -65,7 +65,7 @@ public class ScrollingFABBehavior extends CoordinatorLayout.Behavior<FloatingAct
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionButton child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-        if (((TabLayout) coordinatorLayout.findViewById(tabLayout)).getSelectedTabPosition() == 0) {
+        if (((TabLayout) coordinatorLayout.findViewById(tabLayout)).getSelectedTabPosition() == 0 || ((TabLayout) coordinatorLayout.findViewById(tabLayout)).getSelectedTabPosition() == 3) {
             if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
                 child.hide();
             } else if (dyConsumed < 0 && child.getVisibility() == View.GONE) {

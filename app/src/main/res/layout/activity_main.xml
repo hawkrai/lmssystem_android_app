@@ -23,7 +23,8 @@
 					android:layout_height="?attr/actionBarSize"
 					android:theme="@style/ThemeOverlay.AppCompat.Dark"
 					android:background="?attr/colorPrimary"
-					app:layout_scrollFlags="scroll|enterAlways">
+					app:layout_scrollFlags="scroll|enterAlways"
+					android:animateLayoutChanges="true">
 				<Spinner
 						android:id="@+id/spinner_nav"
 						android:layout_width="wrap_content"
@@ -33,8 +34,14 @@
 						android:id="@+id/spinner_nav2"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:theme="@style/AppDefault"
-				/>
+						android:theme="@style/AppDefault"/>
+				<ImageButton android:layout_width="wrap_content"
+				             android:layout_height="wrap_content"
+				             android:src="@mipmap/ic_check"
+				             android:background="#00ffffff"
+				             android:id="@+id/saveButton"
+				             android:visibility="gone"
+				             android:padding="16dp"/>
 			</android.support.v7.widget.Toolbar>
 
 			<android.support.design.widget.TabLayout
