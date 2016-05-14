@@ -1,8 +1,10 @@
 package com.celt.lms;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -196,9 +198,10 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                         ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
                         if (((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).isTypeList()) {
                             fab.hide();
-                            toggle.syncState();
-                            getSupportActionBar().setHomeAsUpIndicator(R.mipmap.ic_close);
                             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                            toggle.syncState();
+                            animateHamburgerIcon(0, 1);
+
                             final ImageButton imageButton = (ImageButton) findViewById(R.id.saveButton);
                             imageButton.setVisibility(View.VISIBLE);
                             imageButton.setOnClickListener(new View.OnClickListener() {
@@ -221,10 +224,29 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
             private void disableEditStatus(ImageButton imageButton) {
                 ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
                 toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
-                drawerLayout.setDrawerListener(toggle);
                 toggle.syncState();
-                fab.show();
+                animateHamburgerIcon(1, 0);
                 imageButton.setVisibility(View.GONE);
+                fab.show();
+            }
+
+            private void animateHamburgerIcon(int start, int end) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    ValueAnimator anim = ValueAnimator.ofFloat(start, end);
+                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            float slideOffset = 0;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                slideOffset = (Float) valueAnimator.getAnimatedValue();
+                            }
+                            toggle.onDrawerSlide(drawerLayout, slideOffset);
+                        }
+                    });
+                    anim.setInterpolator(new DecelerateInterpolator());
+                    anim.setDuration(500);
+                    anim.start();
+                }
             }
         });
     }
