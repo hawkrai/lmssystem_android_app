@@ -1,16 +1,22 @@
 package com.celt.lms.adapter;
 
+import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.celt.lms.InputFilterMinMax;
 import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.LabDTO;
 import com.celt.lms.dto.ParsingJsonLms;
@@ -47,7 +53,7 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         LinearLayout.LayoutParams layoutParams0 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams0.setMargins(convertDpToPx(parent, 12), convertDpToPx(parent, 5), convertDpToPx(parent, 12), convertDpToPx(parent, 5));
         LinearLayout.LayoutParams layoutParamsMPWC = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -80,12 +86,22 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
             textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             linearLayout3.addView(textView2, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-            EditText editText = new EditText(parent.getContext());
+            final EditText editText = new EditText(parent.getContext());
             editText.setId(listEditTextId.get(i));
             editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             editText.setGravity(Gravity.CENTER_HORIZONTAL);
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            editText.setFilters(new InputFilter[]{new InputFilterMinMax(0, 10)});
+            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+                        InputMethodManager imm = (InputMethodManager) parent.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                    }
+                }
+            });
             linearLayout3.addView(editText, new LinearLayout.LayoutParams(convertDpToPx(parent, 40), LinearLayout.LayoutParams.WRAP_CONTENT));
             linearLayout2.addView(linearLayout3, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
@@ -126,7 +142,7 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         Student item = data.get(position);
         holder.title.setText(item.getFullName());
 
@@ -151,6 +167,31 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
                     holder.listEdiText.get(i).setVisibility(View.GONE);
                 }
             }
+            final int finalI = i;
+            holder.listEdiText.get(i).addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    data.get(position).getStudentLabMarks().get(finalI).setMark(s.toString());
+                }
+            });
+//            final int finalI = i;
+//            holder.listEdiText.get(i).setOnEditorActionListener(new EditText.OnEditorActionListener() {
+//                @Override
+//                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                        data.get(position).getStudentLabMarks().get(finalI).setMark(v.getText().toString());
+//                    return false;
+//                }
+//            });
         }
 
         String s = "";
@@ -217,6 +258,10 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
     public void changeView() {
         editStatus = !editStatus;
         notifyDataSetChanged();
+    }
+
+    public List<Student> getStudents() {
+        return data;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

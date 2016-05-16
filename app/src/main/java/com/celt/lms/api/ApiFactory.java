@@ -10,12 +10,12 @@ import java.util.concurrent.TimeUnit;
 
 public class ApiFactory {
 
-    //    private static final String url = "http://172.16.11.72:2014";
+    //        private static final String url = "http://172.16.11.72:2014";
     private static final String url = "https://collapsed.space";
 
     private final static OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .readTimeout(60, TimeUnit.SECONDS)
-            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .connectTimeout(120, TimeUnit.SECONDS)
             .build();
 
     @NonNull

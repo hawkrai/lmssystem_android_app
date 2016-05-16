@@ -16,6 +16,10 @@ import static com.celt.lms.R.id.tabLayout;
 public class ScrollingFABBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 //    private int toolbarHeight;
 
+
+    public ScrollingFABBehavior() {
+    }
+
     public ScrollingFABBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
 //        this.toolbarHeight = getToolbarHeight(context);

@@ -1,14 +1,14 @@
 package com.celt.lms;
 
+import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
+import android.support.design.widget.*;
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +21,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import com.celt.lms.adapter.*;
 import com.celt.lms.api.ApiFactory;
@@ -28,16 +29,23 @@ import com.celt.lms.api.ApiLms;
 import com.celt.lms.dto.GroupDTO;
 import com.celt.lms.dto.LecturesDTO;
 import com.celt.lms.dto.ParsingJsonLms;
+import com.celt.lms.dto.Student;
 import com.celt.lms.fragments.AbsFragment;
 import com.celt.lms.fragments.FragmentFirstTab;
 import com.celt.lms.fragments.FragmentSecondTab;
 import com.celt.lms.fragments.dialogs.SaveNewsDialogFragment;
 import com.google.gson.JsonElement;
+import okhttp3.RequestBody;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import retrofit2.Call;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.support.design.widget.Snackbar.make;
 
 public class MainActivity extends AppCompatActivity implements onEventListener {
 
@@ -198,57 +206,117 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                         ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
                         if (((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).isTypeList()) {
                             fab.hide();
+                            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                            params.setBehavior(null);
+                            fab.setLayoutParams(params);
                             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                             toggle.syncState();
                             animateHamburgerIcon(0, 1);
 
-                            final ImageButton imageButton = (ImageButton) findViewById(R.id.saveButton);
-                            imageButton.setVisibility(View.VISIBLE);
-                            imageButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    disableEditStatus(imageButton);
-                                }
-                            });
+                            final ImageButton saveButton = (ImageButton) findViewById(R.id.saveButton);
+                            saveButton.setVisibility(View.VISIBLE);
                             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    disableEditStatus(imageButton);
+                                    hideKeyboard(MainActivity.this);
+                                    disableEditStatus(saveButton);
+                                }
+                            });
+                            saveButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    hideKeyboard(MainActivity.this);
+                                    new CallTask().execute(createJsonObjectStudents(((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).getStudentsAdapter()));
+                                }
+
+                                class CallTask extends AsyncTask<JSONObject, Void, String> {
+
+                                    @Override
+                                    protected String doInBackground(JSONObject... params) {
+
+                                        ApiLms api = ApiFactory.getService();
+                                        try {
+                                            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), params[0].toString());
+                                            Call<JsonElement> call = api.saveStudentLabsMark(body);
+                                            JsonElement json = call.execute().body();
+                                            if (json != null)
+                                                return (new JSONObject(json.toString()).optString("Message"));
+                                            else
+                                                return null;
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        return "";
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(String result) {
+                                        if (result == null)
+                                            result = getString(R.string.network_error);
+                                        else {
+                                            disableEditStatus(saveButton);
+                                        }
+                                        make(viewPager, result, Snackbar.LENGTH_LONG).show();
+                                    }
                                 }
                             });
                         }
                         break;
                 }
             }
-
-            private void disableEditStatus(ImageButton imageButton) {
-                ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
-                toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
-                toggle.syncState();
-                animateHamburgerIcon(1, 0);
-                imageButton.setVisibility(View.GONE);
-                fab.show();
-            }
-
-            private void animateHamburgerIcon(int start, int end) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    ValueAnimator anim = ValueAnimator.ofFloat(start, end);
-                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            float slideOffset = 0;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                                slideOffset = (Float) valueAnimator.getAnimatedValue();
-                            }
-                            toggle.onDrawerSlide(drawerLayout, slideOffset);
-                        }
-                    });
-                    anim.setInterpolator(new DecelerateInterpolator());
-                    anim.setDuration(500);
-                    anim.start();
-                }
-            }
         });
+    }
+
+    private void hideKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    private void disableEditStatus(ImageButton saveButton) {
+        ((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).changeView();
+        toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
+        toggle.syncState();
+        animateHamburgerIcon(1, 0);
+        saveButton.setVisibility(View.GONE);
+        fab.show();
+        CoordinatorLayout.LayoutParams la = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        la.setBehavior(new ScrollingFABBehavior());
+        fab.setLayoutParams(la);
+    }
+
+    private JSONObject createJsonObjectStudents(List<Student> studentsList) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONArray students = new JSONArray();
+            for (Student item : studentsList) {
+                students.put(item.getJSONObject());
+            }
+            jsonObject.put("students", students);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    private void animateHamburgerIcon(int start, int end) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ValueAnimator anim = ValueAnimator.ofFloat(start, end);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float slideOffset = 0;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        slideOffset = (Float) valueAnimator.getAnimatedValue();
+                    }
+                    toggle.onDrawerSlide(drawerLayout, slideOffset);
+                }
+            });
+            anim.setInterpolator(new DecelerateInterpolator());
+            anim.setDuration(500);
+            anim.start();
+        }
     }
 
     private void animateFab(final int position) {
@@ -366,10 +434,20 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                hideKeyboard(MainActivity.this);
                 viewPager.setCurrentItem(tab.getPosition());
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    if ((findViewById(R.id.appBarLayout)).getTop() == 0) {
+                        toolbar.setLayoutTransition(new LayoutTransition());
+                    } else {
+                        toolbar.setLayoutTransition(null);
+                    }
+                }
                 if (tab.getText() == getString(R.string.news)) {
                     setVisibilitySpinners(View.GONE);
+                    CoordinatorLayout.LayoutParams la = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                    la.setBehavior(new ScrollingFABBehavior());
+                    fab.setLayoutParams(la);
                     if (fab.getVisibility() == View.GONE) {
                         fab.setImageDrawable(getResources().getDrawable(R.mipmap.ic_plus));
                         fab.show();
@@ -378,11 +456,32 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
                 }
 
                 if (tab.getText() == getString(R.string.marks)) {
-                    if (fab.getVisibility() == View.GONE) {
-                        fab.setImageDrawable(getResources().getDrawable(R.mipmap.ic_pencil_dark));
-                        fab.show();
-                    } else
-                        animateFab(1);
+                    if (((FragmentSecondTab) tabsPagerAdapter.getTabs().get(3)).isTypeList()) {
+                        fab.hide();
+                        CoordinatorLayout.LayoutParams la = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                        la.setBehavior(null);
+                        fab.setLayoutParams(la);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        toggle.syncState();
+                        animateHamburgerIcon(0, 1);
+                        final ImageButton saveButton = (ImageButton) findViewById(R.id.saveButton);
+                        saveButton.setVisibility(View.VISIBLE);
+                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                disableEditStatus(saveButton);
+                            }
+                        });
+                    } else {
+                        CoordinatorLayout.LayoutParams la = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                        la.setBehavior(new ScrollingFABBehavior());
+                        fab.setLayoutParams(la);
+                        if (fab.getVisibility() == View.GONE) {
+                            fab.setImageDrawable(getResources().getDrawable(R.mipmap.ic_pencil_dark));
+                            fab.show();
+                        } else
+                            animateFab(1);
+                    }
                 }
 
                 if (tab.getText() == getString(R.string.education) || tab.getText() == getString(R.string.visiting)) {
@@ -401,7 +500,13 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                if (tab.getText() == getString(R.string.marks)) {
+                    final ImageButton saveButton = (ImageButton) findViewById(R.id.saveButton);
+                    saveButton.setVisibility(View.GONE);
+                    toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
+                    toggle.syncState();
+                    animateHamburgerIcon(1, 0);
+                }
             }
 
             @Override
@@ -460,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements onEventListener {
         protected void onPostExecute(ArrayList<JsonElement> data) {
             isRefresh = false;
 
-            if (data.get(0) != null && data.get(1) != null) {
+            if (data != null && data.get(0) != null && data.get(1) != null) {
                 objects = new Object[2];
                 objects[0] = ParsingJsonLms.getParseGroup(data.get(1).toString());
                 objects[1] = ParsingJsonLms.getParseLectures(data.get(0).toString());

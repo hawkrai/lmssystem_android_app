@@ -1,5 +1,9 @@
 package com.celt.lms.dto;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 class FileLab {
@@ -13,5 +17,27 @@ class FileLab {
         this.commtens = commtens;
         this.id = id;
         this.pathFile = pathFile;
+    }
+
+    JSONObject getJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("Attachments", getAttachmentsJsonArray());
+            jsonObject.put("Comments", commtens);
+            jsonObject.put("Id", id);
+            jsonObject.put("PathFile", pathFile);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return jsonObject;
+    }
+
+    private JSONArray getAttachmentsJsonArray() {
+        JSONArray jsonArray = new JSONArray();
+        for (Attachment item : attachments) {
+            jsonArray.put(item.getJSONObject());
+        }
+        return jsonArray;
     }
 }

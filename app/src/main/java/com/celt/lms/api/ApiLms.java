@@ -26,6 +26,9 @@ public interface ApiLms {
     @POST("/Services/News/NewsService.svc/Delete")
     Call<JsonElement> deleteNews(@Body RequestBody json);
 
+    @Headers("Content-Type: application/json")
+    @POST("/Services/Labs/LabsService.svc/SaveStudentLabsMark")
+    Call<JsonElement> saveStudentLabsMark(@Body RequestBody json);
 
 //    @GET("/Services/Labs/LabsService.svc/GetLabs/{id}")
 //    Call<JsonElement> getLabs(@Path("id") int groupId);

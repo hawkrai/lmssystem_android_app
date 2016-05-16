@@ -9,7 +9,10 @@ import com.celt.lms.MainActivity;
 import com.celt.lms.R;
 import com.celt.lms.adapter.LabMarksListAdapter;
 import com.celt.lms.adapter.ListAdapter;
+import com.celt.lms.dto.Student;
 import com.celt.lms.onEventListener;
+
+import java.util.List;
 
 import static com.celt.lms.MainActivity.setFragment;
 
@@ -76,5 +79,9 @@ public class FragmentSecondTab extends AbsFragment {
 
     public boolean isTypeList() {
         return ((LabMarksListAdapter) adapter).isEditStatus();
+    }
+
+    public List<Student> getStudentsAdapter() {
+        return ((LabMarksListAdapter) adapter).getStudents();
     }
 }

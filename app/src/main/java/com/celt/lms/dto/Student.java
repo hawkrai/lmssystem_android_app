@@ -1,5 +1,9 @@
 package com.celt.lms.dto;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Student {
@@ -49,5 +53,54 @@ public class Student {
 
     public ArrayList<LabVisitingMark> getLabVisitingMark() {
         return labVisitingMark;
+    }
+
+    public JSONObject getJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("FileLabs", getFileLabsJsonArray());
+            jsonObject.put("FullName", fullName);
+            jsonObject.put("GroupId", groupId);
+            jsonObject.put("LabVisitingMark", getLabVisitingMarkJsonArray());
+            jsonObject.put("LabsMarkTotal", labsMarkTotal);
+            jsonObject.put("Login", login);
+            if (practicalMarkTotal.equals("null"))
+                jsonObject.put("PracticalMarkTotal", JSONObject.NULL);
+            else
+                jsonObject.put("PracticalMarkTotal", practicalMarkTotal);
+            jsonObject.put("PracticalVisitingMark", new JSONArray());
+            jsonObject.put("StudentId", studentId);
+            jsonObject.put("StudentLabMarks", getStudentLabMarksJsonArray());
+            jsonObject.put("StudentPracticalMarks", new JSONArray());
+            jsonObject.put("TestMark", testMark);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return jsonObject;
+    }
+
+    private JSONArray getFileLabsJsonArray() {
+        JSONArray jsonArray = new JSONArray();
+        for (FileLab item : fileLabs) {
+            jsonArray.put(item.getJSONObject());
+        }
+        return jsonArray;
+    }
+
+    private JSONArray getLabVisitingMarkJsonArray() {
+        JSONArray jsonArray = new JSONArray();
+        for (LabVisitingMark item : labVisitingMark) {
+            jsonArray.put(item.getJSONObject());
+        }
+        return jsonArray;
+    }
+
+    private JSONArray getStudentLabMarksJsonArray() {
+        JSONArray jsonArray = new JSONArray();
+        for (StudentLabMark item : studentLabMarks) {
+            jsonArray.put(item.getJSONObject());
+        }
+        return jsonArray;
     }
 }
