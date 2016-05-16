@@ -1,7 +1,6 @@
 package com.celt.lms.adapter;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -26,10 +25,12 @@ import retrofit2.Call;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.celt.lms.AndroidUtils.convertDpToPx;
+import static com.celt.lms.AndroidUtils.generateViewId;
 
 public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapter.ViewHolder> implements ListAdapter {
-    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+
     private List<Student> data = null;
     private static int cardId;
     private static int titleId;
@@ -55,7 +56,7 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         LinearLayout.LayoutParams layoutParams0 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams0.setMargins(convertDpToPx(parent, 12), convertDpToPx(parent, 5), convertDpToPx(parent, 12), convertDpToPx(parent, 5));
+        layoutParams0.setMargins(convertDpToPx(parent.getContext(), 12), convertDpToPx(parent.getContext(), 5), convertDpToPx(parent.getContext(), 12), convertDpToPx(parent.getContext(), 5));
         LinearLayout.LayoutParams layoutParamsMPWC = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         LinearLayout linearLayout = new LinearLayout(parent.getContext());
@@ -69,7 +70,7 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
 
         LinearLayout linearLayout2 = new LinearLayout(parent.getContext());
         linearLayout2.setOrientation(LinearLayout.VERTICAL);
-        linearLayout2.setPadding(convertDpToPx(parent, 16), convertDpToPx(parent, 16), convertDpToPx(parent, 16), convertDpToPx(parent, 16));
+        linearLayout2.setPadding(convertDpToPx(parent.getContext(), 16), convertDpToPx(parent.getContext(), 16), convertDpToPx(parent.getContext(), 16), convertDpToPx(parent.getContext(), 16));
 
         TextView textView = new TextView(parent.getContext());
         textView.setId(titleId);
@@ -82,7 +83,7 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
 
             TextView textView2 = new TextView(parent.getContext());
             textView2.setId(listTextViewId.get(i));
-            textView2.setPadding(0, convertDpToPx(parent, 4), 0, 0);
+            textView2.setPadding(0, convertDpToPx(parent.getContext(), 4), 0, 0);
             textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             linearLayout3.addView(textView2, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
@@ -102,13 +103,13 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
                     }
                 }
             });
-            linearLayout3.addView(editText, new LinearLayout.LayoutParams(convertDpToPx(parent, 40), LinearLayout.LayoutParams.WRAP_CONTENT));
+            linearLayout3.addView(editText, new LinearLayout.LayoutParams(convertDpToPx(parent.getContext(), 40), LinearLayout.LayoutParams.WRAP_CONTENT));
             linearLayout2.addView(linearLayout3, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
 
         TextView textView2 = new TextView(parent.getContext());
         textView2.setId(bodyId);
-        textView2.setPadding(0, convertDpToPx(parent, 4), 0, 0);
+        textView2.setPadding(0, convertDpToPx(parent.getContext(), 4), 0, 0);
         textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         linearLayout2.addView(textView2, layoutParamsMPWC);
 
@@ -117,28 +118,6 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
         linearLayout.addView(cardView, layoutParamsMPWC);
 
         return new ViewHolder(linearLayout);
-    }
-
-    private int generateViewId() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return View.generateViewId();
-        } else {
-            for (; ; ) {
-                final int result = sNextGeneratedId.get();
-                // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
-                int newValue = result + 1;
-                if (newValue > 0x00FFFFFF)
-                    newValue = 1; // Roll over to 1, not 0.
-                if (sNextGeneratedId.compareAndSet(result, newValue)) {
-                    return result;
-                }
-            }
-        }
-    }
-
-    private int convertDpToPx(ViewGroup parent, int dp) {
-        final float density = parent.getContext().getResources().getDisplayMetrics().density;
-        return (int) Math.ceil(dp * density);
     }
 
     @Override
@@ -184,14 +163,6 @@ public class LabMarksListAdapter extends RecyclerView.Adapter<LabMarksListAdapte
                     data.get(position).getStudentLabMarks().get(finalI).setMark(s.toString());
                 }
             });
-//            final int finalI = i;
-//            holder.listEdiText.get(i).setOnEditorActionListener(new EditText.OnEditorActionListener() {
-//                @Override
-//                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                        data.get(position).getStudentLabMarks().get(finalI).setMark(v.getText().toString());
-//                    return false;
-//                }
-//            });
         }
 
         String s = "";

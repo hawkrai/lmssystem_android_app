@@ -13,4 +13,7 @@
     <string name="visiting">ПОСЕЩЕНИЕ</string>
     <string name="marks">ОЦЕНКИ</string>
     <string name="education">ОБУЧЕНИЕ</string>
+    <string name="absenteeism_no">Пропусков нет!</string>
+    <string name="labs">Лабораторные работы%1$s</string>
+    <string name="lectures">Лекции%1$s</string>
 </resources>
